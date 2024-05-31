@@ -1,5 +1,6 @@
 %% Function for our Arctic Seasonal Temperature Parameterisation
 % Chapter 2 Methods Section 2.3.3
+
 function obj = AMST_parameterisation_publication2(ppp,x,y,AAMST,e)
 
 f1 = ppp(1);
@@ -19,7 +20,7 @@ a = cos((AAMST.* a1) +a2) +a3;
 y_tas = f.*(cos(x .* g - e .* exp(cos(x.^(a))))+((AAMST - mean(f.*(cos(x .* g - e .* exp(cos(x.^(a))))), 2, 'omitnan')) ./ f));
 
         
-
+% Residual sum of the squared di↵erences (RSS) to find the global minimum
 A = (y - y_tas).^2;
 obj = sum(A);
 obj = mean(obj);
