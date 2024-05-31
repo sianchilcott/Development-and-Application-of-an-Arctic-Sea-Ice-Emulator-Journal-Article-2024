@@ -1,5 +1,5 @@
 %% Function for our Arctic Seasonal Temperature Parameterisation
-% Methods Section 2.3.3
+% Chapter 2 Methods Section 2.3.3
 function obj = AMST_parameterisation_publication2(ppp,x,y,AAMST,e)
 
 f1 = ppp(1);
