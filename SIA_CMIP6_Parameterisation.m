@@ -1,5 +1,5 @@
-%% Function for our Sea Ice Area (SIA) Parameterisation
-% Chapter 2 Methods Section 2.3.4
+%% Function for Sea Ice Area (SIA) Parameterisation
+% Section 2.5
 
 function obj = SIA_CMIP6_Calibration_Publication(SIA_max,x_tas,SIA,dec_previous_year_tas,p)
 
