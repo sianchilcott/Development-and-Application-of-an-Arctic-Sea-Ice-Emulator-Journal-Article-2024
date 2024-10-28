@@ -1,4 +1,4 @@
-%% Observationally Constrained Emulator (OC)
+%% Observationally Constrained Emulator
 
 %% ___________ Step i: Use the observationally constrained Arctic Amplification to calculate the Arctic annual mean temperature ______________________________________________________________________________________________________________________________________________________________________________________________________________________ %% 
 
@@ -447,7 +447,7 @@ disp('___END RUN___')
 
 %% ______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-%% ____________________ Partially Constrained Emulator (OCCAA) _________________________________________________________________________________________________________________________________________________________________________________________
+%% ____________________ Force with MAGICC GMST _________________________________________________________________________________________________________________________________________________________________________________________
 
 
 %% Step i: AAT using CMIP6 AA and apply to MAGICC global mean temperature
@@ -767,7 +767,7 @@ end
 
 
 
-%% Step iii: SIA Parameterisation OCCAA
+%% Step iii: SIA Parameterisation
 
 close; clc
 
@@ -924,7 +924,7 @@ disp('___END RUN___')
 
 
 
-%% _____________ Fig 2.17: Chapter 2, Section 2.5.4: Plot probabilistic SIA and CMIP6 AA SIA all SSPS on same graph ____________________________________ %
+%% _____________ Plot probabilistic SIA and CMIP6 AA SIA all SSPS on same graph _____________ %
 
 
 % Plot Initialisation
