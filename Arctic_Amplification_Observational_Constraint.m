@@ -412,19 +412,58 @@ GMST_random_arrangment3 = GMST;
 
 
 
-%% Plot all three Arctic Amplification ensembles
 
 
 
 
-% PLOT RANDOM SAMPLED AA 1: mean gmst and random sampled s and p
+%% PUBLICATION: ALL 4 PLOTS TOGETHER: WITH FINAL AA
 
-close
+
+
+close all; clc
 figure(42)
 set(gcf, 'Units', 'Inches', 'Position', [.5 .5 20 11])
-h = subplot(2,3,4);
-x_factor = 0.4;
-h.Position(1) = h.Position(1) - 0.08;
+x_factor = 0.07;
+
+% PLOT P: Merged prior
+h = subplot(2,2,3); 
+h.Position(4) = h.Position(4) - x_factor;
+h.Position(3) = h.Position(3) - (x_factor+0.05);
+h.Position(2) = h.Position(2) -- x_factor;
+h.Position(1) = h.Position(1) - x_factor;
+
+plot(xi_P, merged_prior_pdf_P, 'k', 'linewidth', 2); hold on         %  Plot prior informed pdf
+title('a) Final Distribution: P')
+ylabel('Probability')
+xlabel('AA factor')
+grid
+
+ax = gca; ax.FontSize = 18;
+ylim([0 1])
+
+
+
+% PLOT S: Merged prior
+h = subplot(2,2,4);
+h.Position(4) = h.Position(4) - x_factor;
+h.Position(3) = h.Position(3) - (x_factor+0.05);
+h.Position(2) = h.Position(2) -- x_factor;
+h.Position(1) = h.Position(1) - (x_factor*3.5);
+
+plot(xi_S, merged_prior_pdf_S, 'k', 'linewidth', 2); hold on      
+title('b) Final Distribution: S')
+ylabel('Probability')
+xlabel('AA factor change/ yr')
+grid
+ax = gca; ax.FontSize = 18; 
+ylim([0 1])
+% xlim([1 7])
+xlim([1 8])
+
+
+
+% AA PLOT
+axes('Position',[0.6 0.29 0.3 0.48])
 
 
 y1_obs = median(cell2mat(AA_obs_final), 'omitnan');
@@ -509,6 +548,7 @@ hold on
 % Plot emul and cmip6 means
 plt_CMIP6 = plot(x_CMIP6_label, y1_CMIP6, 'color', [1 0 0], 'LineWidth', 2);
 plt_OBS = plot(x, y1_obs, 'color', [0 0 0], 'LineWidth', 2);
+% plt_MCMC = plot(1850:2300, median(save_AA_MCMC{1}), 'color', [0 0 1], 'LineWidth', 2);
 plt_MCMC = plot(1850:2300, median(AA_MCMC{1}), 'color', [0 0 1], 'LineWidth', 2);
 
 
@@ -529,10 +569,10 @@ for n = 1:3
     end
 end
 
-clear text
-text(2030, -1.3, '(a)', 'fontsize', 18, 'fontweight', 'bold')
+text(1960, 6.8, 'c)', 'Fontweight', 'bold', 'Fontsize', 20)
 
-set(gca,'FontSize', 18)
+
+
 
 %   Y Label
 ylabel({'Arctic Amplification'})
@@ -541,16 +581,14 @@ xlabel('Year')
 xlim([1970 2100])
 ylim([0 6])
 grid
-titlea = title({'Random Sampling from s & p pdfs'; 'using mean of global warming pdf'});
-titlea.FontSize = 17;
 
 
-h2 = subplot(2,3,5); 
-h2.Position(1) = h2.Position(1) - 0.146;
-h2.Position(3) = h2.Position(3) - 0.13;
+set(gca,'FontSize', 20)
 
 
-% Create histogram to add to end of ensemble to show the density of each Arctic Amplification factor by 2300
+axes('Position',[.902 .29 .1 .48])
+box on
+
 colorss_new = [1 0.8 0.8; 0.5 0.5 1; 0 0.6906 0.5];
 histogram(AA_MCMC{1}(:,end), 'facecolor', colorss_new(2,:),  'Orientation','horizontal'); ylim([0 6])
 set(gca, 'Color', 'None');
@@ -561,308 +599,19 @@ axis off
 
 
 
+x = [0.56 0.56];
+y = [0.02 0.98];
+annotation('line', x, y, 'LineStyle', '--', 'Linewidth', 2)
 
 
-
-
-
-
-
-
-
-% PLOT RANDOM SAMPLED AA 2: mean of p and s sample from GMST ensemble
-h = subplot(2,3,2);
-h.Position(2) = h.Position(2) - 0.474;
-h.Position(1) = h.Position(1) - 0.02;
-
-y1_obs = median(cell2mat(AA_obs_final), 'omitnan');
-y1_obs = y1_obs(1:end-8);
-y1_obs = movmean(y1_obs, 2);
-
-
-% X
-x_options = 1850:2300;
-x_CMIP6_label = 1850:2100;
-x = 1850:2012;
-
-
-threshold = [0 100];
-
-% Percentile: Option 1
-stdY_option_1 = prctile(AA_MCMC_2{1}, threshold);
-
-
-% Percentile: CMIP6
-stdY_CMIP6 = prctile(cell2mat(CMIP6_AA), threshold);
-
-
-% Percentile: Obs
-stdY_obs = prctile(cell2mat(AA_obs_final), threshold);
-stdY_obs = stdY_obs(:, 1:end-8);
-
-
-% Create curves: Option 1
-curve1 = stdY_option_1(2,:);
-curve2 = stdY_option_1(1,:);
-
-
-% Create curves: Obs 
-curve3 = stdY_obs(2,:);
-curve4 = stdY_obs(1,:);
-
-
-% Create curves: CMIP6
-curve7 = stdY_CMIP6(2,:);
-curve8 = stdY_CMIP6(1,:);
-
-
-
-% Shading std area: Option 1
-x_O1 = [x_options, fliplr(x_options)];
-inBetween_O1 = [curve1, fliplr(curve2)];
-
-
-% Shading std area: CMIP6
-x_CMIP6 = [x_CMIP6_label, fliplr(x_CMIP6_label)];
-inBetween_CMIP6 = [curve7, fliplr(curve8)];
-
-
-% Shading std area: Obs 
-x_OBS = [x, fliplr(x)];
-inBetween2 = [curve3, fliplr(curve4)];
-
-
-% Fill: Option 1
-c = [0 0 1];
-% c = [0.5 0.5 1];
-f = fill(x_O1, inBetween_O1, c, 'edgecolor','none');
-set(f,'facealpha',.3)
-hold on
-
-
-% Fill: CMIP6
-c = [1 0 0];
-f = fill(x_CMIP6, inBetween_CMIP6, c, 'edgecolor','none');
-set(f,'facealpha',.3)
-hold on
-
-
-% Fill: Obs
-d = [0 0 0]+0.05;
-f2 = fill(x_OBS, inBetween2, d, 'edgecolor','none');
-set(f2,'facealpha',.3)
-hold on
-
-
-% Plot emul and cmip6 means
-plt_CMIP6 = plot(x_CMIP6_label, y1_CMIP6, 'color', [1 0 0], 'LineWidth', 2);
-plt_OBS = plot(x, y1_obs, 'color', [0 0 0], 'LineWidth', 2);
-plt_MCMC = plot(1850:2300, median(AA_MCMC{1}), 'color', [0 0 1], 'LineWidth', 2);
-
-
-
-% Add CMIP6 AA
-for n = 1:3
-    for j = 1:12
-        rw = tas_global{n}{j};
-        raa = tas_arctic_annual{n}{j};
-
-        AA = raa ./ rw;
-        AA = movmean(AA, 20);
-
-        x_cmip6 = 1850:2100;
-        plt_cmip6_aa = plot(x_cmip6, AA, 'color', [0 0 0]+0.7, 'LineWidth', 1); hold on
-
-        uistack(plt_cmip6_aa,'bottom'); 
-    end
-end
-
-clear text
-text(2030, -1.3, '(b)', 'fontsize', 18, 'fontweight', 'bold')
-
-set(gca,'FontSize', 18)
-
-%   Y Label
-ylabel({'Arctic Amplification'})
-xlabel('Year')
-
-xlim([1970 2100])
-ylim([0 6])
-grid
-titlea = title({'Random Sampling from'; 'only global warming pdf'});
-titlea.FontSize = 17;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% PLOT RANDOM SAMPLED AA 3: mean gmst and random sampled s and p
-h = subplot(2,3,6);
-h.Position(1) = h.Position(1) - 0.03;
-
-y1_obs = median(cell2mat(AA_obs_final), 'omitnan');
-y1_obs = y1_obs(1:end-8);
-y1_obs = movmean(y1_obs, 2);
-
-
-% X
-x_options = 1850:2300;
-x_CMIP6_label = 1850:2100;
-x = 1850:2012;
-
-
-threshold = [0 100];
-
-% Percentile: Option 1
-stdY_option_1 = prctile(AA_MCMC_3{1}, threshold);
-
-
-% Percentile: CMIP6
-stdY_CMIP6 = prctile(cell2mat(CMIP6_AA), threshold);
-
-
-% Percentile: Obs
-stdY_obs = prctile(cell2mat(AA_obs_final), threshold);
-stdY_obs = stdY_obs(:, 1:end-8);
-
-
-% Create curves: Option 1
-curve1 = stdY_option_1(2,:);
-curve2 = stdY_option_1(1,:);
-
-
-% Create curves: Obs 
-curve3 = stdY_obs(2,:);
-curve4 = stdY_obs(1,:);
-
-
-% Create curves: CMIP6
-curve7 = stdY_CMIP6(2,:);
-curve8 = stdY_CMIP6(1,:);
-
-
-
-% Shading std area: Option 1
-x_O1 = [x_options, fliplr(x_options)];
-inBetween_O1 = [curve1, fliplr(curve2)];
-
-
-% Shading std area: CMIP6
-x_CMIP6 = [x_CMIP6_label, fliplr(x_CMIP6_label)];
-inBetween_CMIP6 = [curve7, fliplr(curve8)];
-
-
-% Shading std area: Obs 
-x_OBS = [x, fliplr(x)];
-inBetween2 = [curve3, fliplr(curve4)];
-
-
-% Fill: Option 1
-c = [0 0 1];
-% c = [0.5 0.5 1];
-f = fill(x_O1, inBetween_O1, c, 'edgecolor','none');
-set(f,'facealpha',.3)
-hold on
-
-
-% Fill: CMIP6
-c = [1 0 0];
-f = fill(x_CMIP6, inBetween_CMIP6, c, 'edgecolor','none');
-set(f,'facealpha',.3)
-hold on
-
-
-% Fill: Obs
-d = [0 0 0]+0.05;
-f2 = fill(x_OBS, inBetween2, d, 'edgecolor','none');
-set(f2,'facealpha',.3)
-hold on
-
-
-% Plot emulation and CMIP6 means
-plt_CMIP6 = plot(x_CMIP6_label, y1_CMIP6, 'color', [1 0 0], 'LineWidth', 2);
-plt_OBS = plot(x, y1_obs, 'color', [0 0 0], 'LineWidth', 2); 
-plt_MCMC = plot(1850:2300, median(AA_MCMC{1}), 'color', [0 0 1], 'LineWidth', 2);
-
-
-
-% Add CMIP6 AA to plot
-for n = 1:3
-    for j = 1:12
-        rw = tas_global{n}{j};
-        raa = tas_arctic_annual{n}{j};
-
-        AA = raa ./ rw;
-        AA = movmean(AA, 20);
-
-        x_cmip6 = 1850:2100;
-        plt_cmip6_aa = plot(x_cmip6, AA, 'color', [0 0 0]+0.7, 'LineWidth', 1); hold on
-
-        uistack(plt_cmip6_aa,'bottom'); 
-    end
-end
-
-set(gca,'FontSize', 18)
-
-
-% Legend
-clear allChildren
-allChildren = get(gca, 'Children');
-legend_labels = ["SE: MCMC Random Sampling Median", "Observational Median", "CMIP6 Calibrated Median", ...
-                "Observations", "SE: CMIP6 Calibration", "SE: MCMC Random Sampling"];
-
-tt2 = legend(allChildren([1,2,3,4,5,6,7]), legend_labels, 'Location', 'southoutside', 'fontsize', 18);
-tt2.Position(2) = tt2.Position(2) - 0.28;
-
-
-clear text
-text(2030, -1.3, '(c)', 'fontsize', 18, 'fontweight', 'bold')
-
-%   Y Label
-ylabel({'Arctic Amplification'})
-xlabel('Year')
-
-xlim([1970 2100])
-ylim([0 6])
-grid
-
-titlea = title({'Random Sampling from both'; 's & p and global warming pdfs'});
-titlea.FontSize = 17;
-
-h2 = subplot(2,3,3); 
-h2.Position(1) = (h2.Position(1) + 0.212) - 0.027;
-h2.Position(2) = h2.Position(2) - 0.474;
-h2.Position(3) = h2.Position(3) - 0.13;
-
-
-
-% Create histogram to add to end of ensemble to show the density of each Arctic Amplification factor by 2300
-colorss_new = [1 0.8 0.8; 0.5 0.5 1; 0 0.6906 0.5];
-histogram(AA_MCMC_3{1}(:,end), 'facecolor', colorss_new(2,:),  'Orientation','horizontal'); ylim([0 6])
-set(gca, 'Color', 'None');
-box off
-ax = gca;
-ax.YAxis.Visible = 'off';
-axis off
-
+% Save
 set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[49 29.7000]);
+set(gcf,'PaperSize',[53 29.7000]);
 
-
-% % Save
-% temp=['Fig.7_copy', '.pdf']; 
+% % Save Normalised
+% temp=['AA_with_pdfs_2', '.pdf']; 
 % saveas(gca,temp);  
+
 
 
 
