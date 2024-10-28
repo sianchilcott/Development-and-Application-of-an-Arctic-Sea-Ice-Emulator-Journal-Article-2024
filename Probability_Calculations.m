@@ -609,7 +609,7 @@ set(tt2,'Position', newPosition,'Units', newUnits);
 
 
 
-%% Likelihood info for tables 4.1 and 4.2: sept
+%% Likelihood info for tables appendix: sept
 
 clc
 % _________________________________________________YEAR___________________________________________________%
@@ -803,7 +803,7 @@ T1_126
 
 
 
-%% Global Temperature at which a 'likekly' ice-free ocean occurs: Fig 4.2
+%% Global Temperature at which a 'likekly' ice-free ocean occurs: Fig 9
 
 close; clc
 figure(38)
@@ -865,7 +865,6 @@ set(gcf,'PaperSize',[53 29.7000]);
 
 
 %% _________ The likelihood of an ice-free ocean in each year: All Months ___________________________________________________________________________________________________________________________________________________________________%%
-% Chapter 4, Appendix, Fig C.1
 
 
 % Initialisation
@@ -1021,7 +1020,6 @@ end
 
 
 %% _________ The likelihood of an ice-free ocean at each GMST: All Months ___________________________________________________________________________________________________________________________________________________________________%%
-% Chapter 4, Appendix, Fig C.2
 % Add GMST probability to the plot
 
 temp_likely_IFC_cmip6aa = [];
@@ -1188,29 +1186,28 @@ end
 
 
 
-%% _____________________ HEAT MAP OF PROBABILITIES IN EACH YEAR: Fig 4.3 (Chapter 4, Section 4.3.2) ______________________________________________________________________________________________________________________%%
+%% ____ Heat Map for Publication: Year and GMST ____ %% 
 
 
-close; clc
+close all; clc
 figure(40)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])   
+set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 14])  
 SSPS = {'SSP5-8.5'; 'SSP2-4.5'; 'SSP1-2.6'};
 for n = 1:3
 
-    % Change positions of plots
-    h = subplot(1,3,n);
+    h = subplot(4,1,n);
     if n == 1
-        h.Position(1) = h.Position(1) - 0.06;
+        h.Position(2) = h.Position(2) + 0.04;
     elseif n == 2
-        h.Position(1) = h.Position(1) - 0.02;
+        h.Position(2) = h.Position(2) + 0.06;
     else
-        h.Position(1) = h.Position(1) + 0.018;
+        h.Position(2) = h.Position(2) + 0.08;
     end
-    h.Position(4) = h.Position(4) - 0.25;
-    h.Position(3) = h.Position(3) + 0.05;
+    h.Position(4) = h.Position(4) + 0.025;
+    h.Position(3) = h.Position(3) - 0.5;
+
     
     
-    % Get probability data fom our OC emulator
     data = P_AA(n,:)';
     data = cell2mat(data);
     
@@ -1219,42 +1216,201 @@ for n = 1:3
     colors = sky(length(values) - 1);
     colormap(colors);
     
-
-    % Make the heat map for each SSP scenario (the data is in an array format, where each column is a year and each row is a month, 12x451)
     heatmap = imagesc(data);
     
-
-    % ____ Plot Edits ____ %
     c = colorbar('Location', 'southoutside');
-    caxis([0 100]);    
+    caxis([0 100]);
+    
     ticks = linspace(0, 100, length(values));
     set(c, 'Ticks', ticks);
     set(c, 'TickLabels', values);
-    ylabel(c,'%','FontSize',18)
-    xlabel('Year')
+    
+    ylabel(c,'%','FontSize',16)
+    if n == 3
+        xlabel('Year')
+    end
     ylabel('Month')
-    title(SSPS{n})
+    % title(SSPS{n})
+    
     yticks(1:12);
     ylim([1 12])
     yticks(1:12); 
     yticklabels({'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'}); % Label the months
+
     ax = gca;
+    % ax.XTickLabel = cellfun(@(v) str2num(v)+1850, ax.XTick, 'UniformOutput', false);
+    % ax.XTickLabel = cellfun(@(v) str2num(v)+1850, ax.XTickLabel, 'UniformOutput', false);
+    % ax.XLim([1850 2300])
+    % ax.XLim([0 451])
     xticks(0:50:450);
     ax.XTickLabel = string(ax.XTick+1850);
+    xtickangle(20)
+
+
+    % xline(250, 'linewidth', 2)
+    % xline(175, 'linewidth', 1)
     xlim([0 451])
-    ax.FontSize = 18;
+
+    % xticks(0:10:450);
+    % ax.XTickLabel = string(ax.XTick+1850);
+    % xlim([151 250])
+    
+    ax.FontSize = 16;
+
+    grid minor
+
+    if n == 1 || n == 2
+        % colorbar('off');
+        set(ax, 'XTick', [])
+    end
+
+    colorbar('off');
 end
 
-% Save
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[51 30]);
+% c.Position = [0.1301    0.3668    0.2750    0.02];
+
+
+
+
+
+% Add GMST
+cumulative_matrix_interpolated = [];
+% for n = 1
+
+    h = subplot(4,1,4);
+    if n == 1
+        h.Position(2) = h.Position(2) + 0.02;
+    elseif n == 2
+        h.Position(2) = h.Position(2) + 0.04;
+    else
+        h.Position(2) = h.Position(2) + 0.06;
+    end
+    h.Position(4) = h.Position(4) + 0.025;
+    h.Position(3) = h.Position(3) - 0.5;
+
+
+    gmst_hold = GT_ensembles';
+    gmst_hold = cell2mat(gmst_hold);
+    max_gmst = max(max(gmst_hold));
+    ice_free_temperatures_hold = GMST_prob_setup_final;
+    ice_free_temperatures = cellfun(@transpose, ice_free_temperatures_hold, 'UniformOutput', false)';
+
+    
+    
+    % Define the common temperature range for the x-axis (e.g., 0 to 20 degrees)
+    x_common = 0:0.26:20;  
+    
+    % Number of months
+    num_months = length(ice_free_temperatures);
+    
+    % Preallocate a matrix to hold the interpolated cumulative probabilities
+    cumulative_matrix_interpolated = NaN(num_months, length(x_common));
+    
+    % Calculate and interpolate cumulative probability for each month
+    for i = 1:num_months
+        % Get the temperatures and retain NaNs
+        temp_data = ice_free_temperatures{i};
+        if all(isnan(temp_data)) == 1
+            continue
+        end
+        if length(unique(temp_data(~isnan(temp_data)))) < 2
+            continue
+        end
+        
+        % Identify non-NaN values and their corresponding indices
+        valid_indices = ~isnan(temp_data);
+        sorted_temps = temp_data(valid_indices);
+        
+        % If there are valid temperatures, proceed
+        if ~isempty(sorted_temps)
+            % Sort temperatures and calculate cumulative probability
+            sorted_temps = sort(sorted_temps); 
+            [sorted_temps, ia] = unique(sorted_temps, 'stable');
+            cumulative_probability = (1:length(sorted_temps)) / length(temp_data); % normalize by total data points including NaNs
+
+            max_gmst = max(sorted_temps);
+            
+            % Interpolate over the common temperature range
+            interpolated_probs = interp1(sorted_temps, cumulative_probability, x_common, 'linear', 'extrap');
+            
+            % Fill missing values after the last known temperature with the last cumulative probability
+            last_prob = cumulative_probability(end);
+            interpolated_probs(x_common > max(sorted_temps)) = last_prob;
+
+            % if m == 3
+            %     max_temp = max(sorted_temps);
+            %     interpolated_probs(x_common > max_temp) = NaN;
+            % end
+            
+            % Assign interpolated probabilities to the matrix
+            cumulative_matrix_interpolated(i, :) = interpolated_probs;
+        else
+            % If all NaNs, assign zero probability across the range
+            cumulative_matrix_interpolated(i, :) = 0;
+        end
+    end
+    
+    % Plot the heatmap using imagesc
+    imagesc(x_common, 1:num_months, cumulative_matrix_interpolated.*100);
+    
+    values = [0 1 10 33 66 90 100]; 
+    colors = sky(length(values) - 1);
+    colormap(colors);
+    
+    c = colorbar('Location', 'southoutside');
+    caxis([0 100]);
+    
+    ticks = linspace(0, 100, length(values));
+    set(c, 'Ticks', ticks);
+    set(c, 'TickLabels', values)
+
+    ylabel(c,'%','FontSize', 16)
+    xlabel('Global Mean Temperature Anomaly (\circC)')
+    ylabel('Month')
+    
+    yticks(1:12);
+    ylim([1 12])
+    yticks(1:12); 
+    yticklabels({'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'}); % Label the months
+
+    % new_xticks = 0:0.5:9;
+    ax = gca;
+    ax.XMinorTick = 'on';
+    % set(ax, 'XTick', new_xticks);
+
+
+    if m == 1 || m == 2
+        if n == 1
+            xlim([0 9])
+        else
+            xlim([0 round(max_gmst)])
+        end
+    else
+        xlim([0 round(max_gmst)])
+    end
+
+    ax = gca; ax.FontSize = 16; 
+
+    grid minor
+
+% end
+
+text(0.2, -39, 'SSP5-8.5', 'color', [0 0 0]+0.2, 'FontSize', 16)
+text(0.2, -27, 'SSP2-4.5', 'color', [0 0 0]+0.2, 'FontSize', 16)
+text(0.2, -15, 'SSP1-2.6', 'color', [0 0 0]+0.2, 'FontSize', 16)
+
+x = [0.085 0.43];
+y = [repelem(0.332, 2)];
+annotation('line', x, y, 'LineStyle', '--', 'Linewidth', 2)
+    
+
+c.Position = [0.1301    0.05    0.2750    0.015];
+
+% Save Normalised
+set(gcf, 'PaperOrientation', 'portrait')
+set(gcf,'PaperSize',[50 40]);
 
 % % Save Normalised
-% temp=['Fig4.3', '.pdf']; 
+% temp=['heat_map_year_gmst', '.pdf']; 
 % saveas(gca,temp); 
-
-
-
-
-
 
