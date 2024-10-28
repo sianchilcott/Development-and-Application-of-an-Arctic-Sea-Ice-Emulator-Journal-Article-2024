@@ -1,4 +1,4 @@
-%% Arctic Amplification: Chapter 2 Section 2.4.2.1
+%% Arctic Amplification: Section 2.3
 
 % Initialise Obs
 
@@ -97,7 +97,7 @@ ax = gca; ax.FontSize = 18;
 
 
 
-%% _____________________________________________________________________________________________________________________________________________________________________%% 
+%% ___________________________________________________________%% 
 %% Step 2: Create second pdf from models and obs: P
 
 
@@ -270,7 +270,7 @@ xlim([1 8])
 
 
 
-%% Extract values based on probability for input into AAobs (Eq:2.4)
+%% Extract values based on probability for input into AAobs (Eq:1)
 
 
 num_samples = 600; % Number of samples you want to generate
