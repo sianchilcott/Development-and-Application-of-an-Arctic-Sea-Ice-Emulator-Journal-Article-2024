@@ -1,5 +1,5 @@
 %% Arctic Seasonal Temperature (AMST) Calibration
-% Chapter 2 Section 2.3.3
+% Section 2.4
 
 % Initialise
 parameters_store = [];      % Save parameters
@@ -163,7 +163,7 @@ toc
 
 
 
-%% Figure 2.3: Test calibration
+%% Figure 4: Test calibration
 
 % Plot Initialisation
 index_run = [1, 4, 7, 12];  % Example models to plot
