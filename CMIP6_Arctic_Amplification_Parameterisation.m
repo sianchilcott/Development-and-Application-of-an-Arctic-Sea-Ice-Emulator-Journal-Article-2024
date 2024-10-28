@@ -1,6 +1,6 @@
 %% CMIP6 Arctic Amplification (AA) Parameterisation
 
-rc_save = [];  % Save regression coefficients for CMIP6 AA parameterisation (Chapter 2 Section 2.3.2)
+rc_save = [];  % Save regression coefficients for CMIP6 AA parameterisation (Section 2.3)
 AAT_emulation_anomaly = [];  % Save Arcitc annual mean temperature anomaly
 AAT_emulation_absolute = []; % Save Arcitc annual mean temperature absolute
 for n = 1:3
@@ -14,7 +14,7 @@ for n = 1:3
         % Calculate regression coefficients to get AA
         coefficients = polyfit(rw, raa, 1);
         sl = coefficients(1);
-        rc_save{j,n} = sl;
+        rc_save{j,n} = sl; % sl = beta (ß)
         
         
         % Calculate the Arctic annual temperature anomaly 
@@ -34,7 +34,7 @@ rc_save = cell2mat(rc_save);
 
 
 
-%% Thesis Figure 2.2
+%% Figure 2
 
 
 % Re-shape variables for plotting
