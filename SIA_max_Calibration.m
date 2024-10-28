@@ -1,5 +1,5 @@
 %% Stage iii: SIA Parameterisation
-% SIA_max Calibration (Chapter 2 Section 2.3.4)
+% SIA_max Calibration (Section 2.5.1)
 
 
 SIA_max_param_1850 = [];
