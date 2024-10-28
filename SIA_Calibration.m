@@ -146,7 +146,7 @@ end
 
 
 
-%% Figure 2.5: Test SIA Calibration
+%% Figure 5: Test SIA Calibration
 
 % Initialise Plot
 index_run = [6,8,11,10];    % Example models
