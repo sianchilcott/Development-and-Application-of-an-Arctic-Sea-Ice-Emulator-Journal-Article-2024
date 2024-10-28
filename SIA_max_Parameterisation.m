@@ -1,5 +1,5 @@
 %% Function for SIA_max 
-% Chapter 2 Section 2.3.4
+% Section 2.5.1
 
 function obj = SIA_max_Calibration_Publication(ppp, x, SIA_max_cmip6)
 
