@@ -99,52 +99,6 @@ for month_ind = [3,9]
 
 
 
-
-    % ________ EMUL CMIP6 SENS ________ %
-    % % Calculate the Emulated Sensitivity: GW
-    % clear coefficients
-    % emul_cmip6_sens_hold = [];
-    % for n = 1
-    %     for j = 1:12
-    %         SIA_cmip6 = sia_emul_final_NO_BC{n}{j,month_ind};
-    %         SIA_cmip6 = movmean(SIA_cmip6, movmean_ind);
-    %         SIA_cmip6 = SIA_cmip6(index_1974_2014);
-    % 
-    %         GT_cmip6 = tas_global{n}{j};
-    %         GT_cmip6 = movmean(GT_cmip6, movmean_ind);
-    %         GT_cmip6 = GT_cmip6(index_1974_2014);
-    % 
-    %         coefficients = polyfit(GT_cmip6, SIA_cmip6, 1);
-    %         emul_cmip6_sens_hold{j,n} = coefficients(1); 
-    %     end
-    % end
-    % emul_cmip6_sens{month_ind} = cell2mat(emul_cmip6_sens_hold);
-
-
-        
-    % Calculate the Emulated Sensitivity: CO2
-    % clear coefficients
-    % emul_cmip6_sens_hold = [];
-    % for n = 1
-    %     for j = 1:12
-    %         SIA_cmip6 = sia_emul_final_NO_BC{n}{j,month_ind};
-    %         SIA_cmip6 = movmean(SIA_cmip6, movmean_ind);
-    %         SIA_cmip6 = SIA_cmip6(index_1974_2014);
-    % 
-    %         GT_cmip6 = cumsum_co2_emissions_int{n}(101:351);
-    %         GT_cmip6 = movmean(GT_cmip6, movmean_ind);
-    %         GT_cmip6 = GT_cmip6(index_1974_2014);
-    % 
-    %         coefficients = polyfit(GT_cmip6, SIA_cmip6, 1);
-    %         emul_cmip6_sens_hold{j,n} = coefficients(1); 
-    %     end
-    % end
-    % emul_cmip6_sens_co2_hold = cell2mat(emul_cmip6_sens_hold);
-    % emul_cmip6_sens_co2{month_ind} = (emul_cmip6_sens_co2_hold .* 1e12) / 1e9;
-    % ________ EMUL CMIP6 SENS END ________ %
-
-
-
     % ________ CMIP6 SENS ________ %
     % Calculate the CMIP6 Sensitivity: GW
     clear coefficients
@@ -322,12 +276,6 @@ for month_ind = [3,9]
         % Plausible range
         boxplot([-2.73, -5.28], 'positions', [ind-0.045], 'color', colorss1(2,:), 'plotstyle','compact'); hold on 
 
-        % Plausible range
-        % std_deviation = std(cmip6_sens{month_ind}, 'omitnan');
-        % two_std_devs = 1 * std_deviation;
-        % March_med = median(obs_sens{month_ind}(:), 'omitnan');
-        % boxplot([March_med-two_std_devs, March_med+two_std_devs], 'positions', [ind-0.045-0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on 
-
         % Actual obs
         obs_sens_bp = boxplot(obs_sens{month_ind}(:), 'positions', [ind], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
         hAx = gca;
@@ -337,11 +285,6 @@ for month_ind = [3,9]
         bp_cmip6.YData(1,1) = quantile(obs_sens{month_ind}(:), 0.25);
         bp_cmip6.YData(1,2) = quantile(obs_sens{month_ind}(:), 0.75);
     else
-        % % Plausible range
-        % std_deviation = std(cmip6_sens{month_ind}, 'omitnan');
-        % two_std_devs = 2 * std_deviation;
-        % March_med = median(obs_sens{month_ind}(:), 'omitnan');
-        % boxplot([March_med-two_std_devs, March_med+two_std_devs], 'positions', [ind-0.045-0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on 
 
         % Actual obs
         obs_sens_bp = boxplot(obs_sens{month_ind}(:), 'positions', [ind], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
@@ -365,14 +308,6 @@ for month_ind = [3,9]
     bp_cmip6.YData(1,1) = quantile( cmip6_sens{month_ind}, 0.25);
     bp_cmip6.YData(1,2) = quantile( cmip6_sens{month_ind}, 0.75);
     
-    
-    % boxplot(emul_cmip6_sens{month_ind}, 'positions', [ind+0.03], 'color', colorss1(2,:), 'plotstyle','compact'); hold on    % CMIP6
-    % hAx = gca;
-    % lines = hAx.Children;
-    % lines = lines(1);
-    % bp_cmip6 = findobj(lines, 'tag', 'Box');
-    % bp_cmip6.YData(1,1) = quantile( emul_cmip6_sens{month_ind}, 0.25);
-    % bp_cmip6.YData(1,2) = quantile( emul_cmip6_sens{month_ind}, 0.75);
 
        
     % % OCCAA GMST 
@@ -472,11 +407,6 @@ for month_ind = [3,9]
         bp_cmip6 = findobj(lines, 'tag', 'Box');
         bp_cmip6.YData(1,1) = quantile(obs_sens_co2{month_ind}(:), 1.0);
         bp_cmip6.YData(1,2) = quantile(obs_sens_co2{month_ind}(:), 0.0);
-
-        % std_deviation = std(cmip6_sens_co2{month_ind}, 'omitnan');
-        % two_std_devs = 2 * std_deviation;
-        % March_med = median(obs_sens_co2{month_ind}(:), 'omitnan');
-        % boxplot([March_med-two_std_devs, March_med+two_std_devs], 'positions', [ind-0.045-0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on 
     end
 
     
@@ -490,14 +420,6 @@ for month_ind = [3,9]
     bp_cmip6.YData(1,1) = quantile( cmip6_sens_co2{month_ind}, 0.25);
     bp_cmip6.YData(1,2) = quantile( cmip6_sens_co2{month_ind}, 0.75);
     
-    
-    % boxplot(emul_cmip6_sens_co2{month_ind}, 'positions', [ind+0.03], 'color', colorss1(2,:), 'plotstyle','compact'); hold on    % CMIP6
-    % hAx = gca;
-    % lines = hAx.Children;
-    % lines = lines(1);
-    % bp_cmip6 = findobj(lines, 'tag', 'Box');
-    % bp_cmip6.YData(1,1) = quantile( emul_cmip6_sens_co2{month_ind}, 0.25);
-    % bp_cmip6.YData(1,2) = quantile( emul_cmip6_sens_co2{month_ind}, 0.75);
 
    
     
