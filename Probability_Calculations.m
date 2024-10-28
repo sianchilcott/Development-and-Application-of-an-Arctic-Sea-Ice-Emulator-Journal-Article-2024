@@ -1,4 +1,4 @@
-%% Probability Calculations: using OC, OCCAA, CE emulators and CMIP6 data: Thesis Chapter 4
+%% Probability Calculations
 
 %% Calculate the 1st year an ice-free Arctic Ocean occurs from our OC emulator
 
@@ -245,8 +245,7 @@ year_threshold_tas_median(row, col) = nan;
 
 
 
-%% _____ The likelihood of an ice-free ocean in each year and at each GMST _______________________________________________________________________________________________________________________________________________________________________%%
-% Chapter 4, Section 4.3.1, Fig 4.1
+%% _____ The likelihood of an ice-free ocean in each year and at each GMST _____%%
 % Only September and March on same graph
 
 
@@ -1019,7 +1018,7 @@ end
 
 
 
-%% _________ The likelihood of an ice-free ocean at each GMST: All Months ___________________________________________________________________________________________________________________________________________________________________%%
+%% _________ The likelihood of an ice-free ocean at each GMST: All Months _________ %%
 % Add GMST probability to the plot
 
 temp_likely_IFC_cmip6aa = [];
