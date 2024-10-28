@@ -1413,3 +1413,320 @@ set(gcf,'PaperSize',[50 40]);
 % temp=['heat_map_year_gmst', '.pdf']; 
 % saveas(gca,temp); 
 
+
+
+
+
+%% ________ Probability of an ice-free ocean at each GMST WITH OTHER STUDIES ON PLOT ________ %%
+
+
+clear text
+% Initialisation
+colorss1 = [1 0.8 0.8; 0.8 0.8 1; 0 0.6906 0.5];
+colorss2 = [1 0 0; 0 0 1; 0 0.3906 0];
+SSP_set = {'SSP585', 'SSP245', 'SSP126'};
+years = 1850:2300;
+tas_2150 = [];
+hnew_cal = [];
+P_ssp = [];
+P_AA = [];
+P_AA_CMIP6 = [];
+P_CMIP6 = [];
+P_AA_CMIP6_OG = [];
+percentsa = [];
+percentsa_cmip6_aa = [];
+hnew = [];
+tas_at_100 = [];
+P_ssp_cmip6_aa = [];
+plota_cmip6_aa = [];
+tas_at_100_cmip6_aa = [];
+counter = 0;
+marker_size = 80;
+month_ind = 3;      % Month to plot
+
+close
+fig2 = figure(67);
+set(gcf, 'Units', 'Inches', 'Position', [.3 .3 19 10]);
+% _________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+% Add GMST probability to the plot
+
+OC_emulator_gmst_likely = [];
+OCCAA_emulator_gmst_likely = [];
+clear hh
+clear tt2
+for n = 1:3           % SSP scenario
+    counter = 2;
+    for i = [9]  %  Month to plot     
+        counter = counter + 1;
+        % h = subplot(1,1,1);
+        h = subplot(2,2,4);
+    
+        hold on
+
+
+        % grid
+        % Probability of an ice-free ocean when SIA is calculated from the OC emulator
+        data_hist_UR = closestIndex_save_GMST_SSPs{n}{i};
+        find_nan = find(isnan(data_hist_UR)==0);
+        if isempty(find_nan) ~= 1
+            cdf_hold = cdfplot(data_hist_UR); 
+            cdf_hold.Color = [1 1 1];
+            ind = find(isnan(data_hist_UR)==1); 
+            data_hist_hold = data_hist_UR;
+            data_hist_hold(ind) = [];
+            nbins2 = length(data_hist_hold);
+            updated_ydata = cdf_hold.YData .* (nbins2/7200);
+            updated_xdata = cdf_hold.XData;
+            hh(1) = plot(updated_xdata, updated_ydata, 'color', colorss2(n,:), 'LineWidth', 3);     % Plot the cdf
+            % hh(1) = plot(updated_xdata(1:40:end), updated_ydata(1:40:end), 'color', colorss2(n,:), 'LineWidth', 4);     % Plot the cdf
+            uistack(hh(1),'top');  
+
+            delete(cdf_hold)
+        end
+        OC_emulator_gmst_likely_hold = find(updated_ydata <= 0.66);
+        if OC_emulator_gmst_likely_hold(end) ~= length(updated_ydata)
+            OC_emulator_gmst_likely{n,i} = updated_xdata(OC_emulator_gmst_likely_hold(end));
+        else
+            OC_emulator_gmst_likely{n,i} = NaN;
+        end
+        if n == 3 & i == 9
+            clear max
+            [OC_emulator_gmst_likely_hold, ind] = max(updated_ydata);
+            OC_emulator_gmst_likely{n,i} = updated_xdata(ind);
+        end
+        if n == 3 & i == 3
+            OC_emulator_gmst_likely{n,i} = NaN;
+        end
+
+        % posnew = get(h, 'Position');
+        % posnew(1) = posnew(1) + 0.5;
+
+        xline(1.5)
+        xline(2)
+
+        % % Probability of an ice-free ocean when SIA is calculated from the CMIP6 CALIBRATED AA: OCCAA
+        % data_hist = closestIndex_save_GMST_SSPs_CMIP6_AA{n}{i};            
+        % find_nan = find(isnan(data_hist)==0);
+        % if isempty(find_nan) ~= 1
+        %     cdf_hold = cdfplot(data_hist); 
+        %     cdf_hold.Color = [1 1 1];
+        %     ind = find(isnan(data_hist)==1);
+        %     data_hist_hold = data_hist;
+        %     data_hist_hold(ind) = [];
+        %     nbins2 = length(data_hist_hold); 
+        %     updated_ydata = cdf_hold.YData .* (nbins2/7200);
+        %     updated_xdata = cdf_hold.XData;
+        %     % hh(2) = plot(updated_xdata, updated_ydata, '--', 'color', colorss2(n,:), 'LineWidth', 2);
+        %     if n == 3 && i == 9
+        %         ind = 300;
+        %     elseif n == 2 && i == 9
+        %         ind = 600;
+        %     elseif n == 1
+        %         if i == 9
+        %             ind = 600;
+        %         elseif i == 3
+        %             ind = 500;
+        %         end
+        %     end
+        %     % hh(2) = plot(updated_xdata(1:ind:end), updated_ydata(1:ind:end), '-.', 'color', colorss2(n,:), 'LineWidth', 0.2);
+        %     hh(2) = plot(updated_xdata, updated_ydata, '-.', 'color', colorss2(n,:), 'LineWidth', 1.5);
+        %     uistack(hh(2),'top');
+        % 
+        %     delete(cdf_hold)
+        % 
+        %     % OCCAA_emulator_gmst_likely_hold = find(updated_ydata >= 0.66);
+        %     % if isempty(OCCAA_emulator_gmst_likely_hold) ~= 1
+        %     %     OCCAA_emulator_gmst_likely{n,i} = updated_xdata(OCCAA_emulator_gmst_likely_hold(1));
+        %     % elseif isempty(OCCAA_emulator_gmst_likely_hold) == 1
+        %     %     OCCAA_emulator_gmst_likely{n,i} = NaN;
+        %     % end
+        % end    
+        % OCCAA_emulator_gmst_likely_hold = find(updated_ydata >= 0.66);
+        % if isempty(OCCAA_emulator_gmst_likely_hold) ~= 1
+        %     OCCAA_emulator_gmst_likely{n,i} = updated_xdata(OCCAA_emulator_gmst_likely_hold(1));
+        % elseif isempty(OCCAA_emulator_gmst_likely_hold) == 1
+        %     OCCAA_emulator_gmst_likely{n,i} = NaN;
+        % end
+        % if n == 3 & i == 3
+        %     disp('n=1 i=3')
+        %     OCCAA_emulator_gmst_likely{n,i} = NaN;
+        % end
+        % if n == 3 & i == 9
+        %     [OCCAA_emulator_gmst_likely_hold, ind] = max(updated_ydata);
+        %     OCCAA_emulator_gmst_likely{n,i} = updated_xdata(ind);
+        % end
+        % 
+        % 
+        % 
+        % % Probability of an ice-free ocean when SIA is calculated from the CMIP6
+        % data_hist = closestIndex_save_GMST_SSPs_CMIP6{n}{i};            
+        % find_nan = find(isnan(data_hist)==0);
+        % if isempty(find_nan) ~= 1
+        %     cdf_hold = cdfplot(data_hist); 
+        %     cdf_hold.Color = [1 1 1];
+        %     ind = find(isnan(data_hist)==1);
+        %     data_hist_hold = data_hist;
+        %     data_hist_hold(ind) = [];
+        %     nbins2 = length(data_hist_hold);
+        %     updated_ydata = cdf_hold.YData .* (nbins2/12);
+        %     updated_xdata = cdf_hold.XData;
+        %     hh(2) = plot(updated_xdata, updated_ydata, '-.', 'color', colorss2(n,:), 'LineWidth', 2);
+        %     if n == 3 && i == 9
+        %         ind = 300;
+        %     elseif n == 2 && i == 9
+        %         ind = 600;
+        %     elseif n == 1
+        %         if i == 9
+        %             ind = 600;
+        %         elseif i == 3
+        %             ind = 500;
+        %         end
+        %     end
+        %     % hh(2) = plot(updated_xdata(1:ind:end), updated_ydata(1:ind:end), '--', 'color', colorss2(n,:), 'LineWidth', 0.2);
+        %     hh(2) = plot(updated_xdata, updated_ydata, '--', 'color', colorss2(n,:), 'LineWidth', 0.2);
+        %     uistack(hh(2),'top');
+        % 
+        %     delete(cdf_hold)
+        % end
+        % 
+
+
+        % uistack(cdf_hold,'bottom');
+
+        % Add labels to plot       
+        % title_label = sgtitle([month_label{i}], 'fontsize', 32);
+        % title(' ')      % Don't add a title as we add one to the top panel
+
+        pos_title = title([ month_label{i} ], 'fontsize', 20);  % Title of each column (Month)
+
+        if n == 3
+            y_lab = ylabel({'CDF of an Ice-free'; 'Arctic Ocean at each GMST'});
+        end        
+        xlabel('GMST (\circC)')
+        set(gca,'FontSize', 20)     
+    
+
+        % Add lines and labels to indicate the IPCC 'likely', 'very likely', 'unlikely' and 'very unlikely' boundaries
+        c = [0 0 0]+0.6;
+        yline(0.10, 'color', c, 'linewidth', 1)
+        hold on
+        yline(0.90, 'color', c, 'linewidth', 1)
+        yline(0.33, 'color', c, 'linewidth', 1)
+        yline(0.66, 'color', c, 'linewidth', 1)
+    
+    
+        % Make sure the x and ylabels are correct
+        if i == 9
+            xticks([0:1:4])
+            xlim([0 4])
+        elseif i == 3
+            xticks([0:1:9])
+            xlim([0 9.5])
+        end    
+        yticks([0:0.2:1]);
+        yticklabels({"0", "20", "40", "60", "80", "100"})
+        
+    
+                
+        text(0.03, 0.05, 'Very Unlikely', 'color', c, 'FontSize',15)
+        text(0.03, 0.95, 'Very Likely', 'color', c, 'FontSize',15)
+        text(0.03, 0.75, 'Likely', 'color', c, 'FontSize',15)
+        text(0.03, 0.23, 0.05, 'Unlikely', 'color', c, 'FontSize',15)
+        % if i == 3
+        %     text(0.03, 1.05, 'c)', 'color', [0 0 0], 'FontSize',19, 'Fontweight', 'bold')
+        % elseif i == 9
+        % 
+        %     text(0.03, 1.08, 'd)', 'color', [0 0 0], 'FontSize',19, 'Fontweight', 'bold')
+        % end
+        % grid
+
+    
+    
+        % Add errorbars in
+        hold on
+        if n == 3 & i == 9
+            hh(3) = errorbar(1.9500, 0.66, 0.25, 0.25, 'horizontal', 'Linewidth', 3, 'color', [0 0 0], 'capsize', 12);
+            uistack(hh(3),'top');
+    
+            hh(4) = errorbar(2.15, 0.9, 0.65, 0.65, 'horizontal', 'Linewidth', 3, 'color', [0 0 0], 'capsize', 12, 'linestyle', '--');
+            hh(4).Bar.LineStyle = 'dashed';
+            uistack(hh(4),'top');
+    
+            hh(5) = errorbar(1.7, 0.68, 0.4, 0.4, 'horizontal', 'Linewidth', 2, 'color', [0 0 0], 'capsize', 12, 'linestyle', ':');
+            hh(5).Bar.LineStyle = 'dotted';
+            uistack(hh(5),'top');
+    
+            hh(6) = scatter(2, 0.6, 100, 'k', 'filled');
+    
+            hh(7) = scatter(1.5, 0.01, 100, 'd', 'k', 'filled');
+    
+            hh(8) = scatter(2, 0.42, 100, 'd', 'k', 'filled');
+    
+            hh(9) = scatter(2, 0.39, 100, 's', 'k', 'filled');
+    
+            hh(10) = scatter(2, 0.80, 120, 'hexagram', 'k', 'filled');
+    
+            hh(11) = scatter(2, 0.41, 120, 'r', 'filled');
+    
+        elseif n == 3 && i == 3
+            % hh(3) = scatter(8.8, 0.66, 120, 'k', 'filled');
+            hh(3) = errorbar(8.8, 0.66, 0.25, 0.25, 'horizontal', 'Linewidth', 3, 'color', [0 0 0], 'capsize', 12);
+            uistack(hh(3),'top');
+        end
+    
+  
+
+
+        if n == 3 && i == 9
+            % Add legend
+            clear allChildren
+            allChildren = get(gca, 'Children');
+            legend_labels = ["This Study: SSP5-8.5", "This Study: SSP2-4.5", "This Study: SSP1-2.6",...
+                            "CMIP6 SSP5-8.5", "Sigmond et al, (2018)", "Screen & Williamson, (2017)", ...
+                            "Ridley & Blockley, (2018): 2°C", "Ridley & Blockley, (2018): 1.5°C",...
+                            "Jahn, (2018)", "Notz and Stroeve, (2018)", "Mahlstein and Knutti, (2012)", "Niederdrenk and Notz, (2018)"];
+    
+            % tt2 = legend(allChildren([42, 21, 33, 1:9]), legend_labels, 'location', 'southeast', 'fontsize', 15);
+            tt2 = legend(allChildren([42, 20, 31, 1:9]), legend_labels, 'location', 'southeast', 'fontsize', 15);
+            uistack(tt2,'top'); 
+
+            h.Position(1) = h.Position(1) - 0.2;
+            
+        end
+    end
+end
+grid
+legend boxoff
+
+grid
+% Posistion legend in the correct place
+% newPosition = [0.85 0.5 0.01 0.01];
+newPosition = [0.89 0.28 0.01 0.01];
+newUnits = 'normalized';
+set(tt2,'Position', newPosition,'Units', newUnits);
+
+
+
+
+
+% % Save Normalised
+% set(gcf, 'PaperOrientation', 'landscape')
+% set(gcf,'PaperSize',[53 29.7000]);
+% 
+% % Save Normalised
+% temp=['Prob_Sept_test','.pdf']; 
+% saveas(gca,temp);
+
+
+
+
+% Save Normalised
+set(gcf, 'PaperOrientation', 'landscape')
+set(gcf,'PaperSize',[51 30]);
+
+temp=['Prob_Sept_test2', '.pdf']; 
+print('-dpdf', '-painters', ['alt', temp])
+
+
+
+
