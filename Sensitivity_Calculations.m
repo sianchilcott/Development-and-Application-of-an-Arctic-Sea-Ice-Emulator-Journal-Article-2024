@@ -1,293 +1,45 @@
-%% Sensitivity from OC and OCCAA Emulators
+%% Sensitivity Emulator
 
 
-%% ______ Fig 2.16 (Chapter 2, Section 2.5.4) (only March and September) _______ % 
+%% ______ Fig 7 (Section 3.2) (only March and September) _______ % 
 
 
 % Initialise Plot  
+% movmean_ind = 1;
 movmean_ind = 20;
 years = 1850:2300;
-index_1974_2014 = [130:165]; % to extract 1979-2014
-
-% Get colour RGB triplets
+index_1974_2014 = [130:165]; % actually 1979-2014
+% index_1974_2014 = [130:170]; % actually 1979-2014
+emul_ind = [0:600:7200];
+emul_ind(1) = 1;
+plot_mods = [4.5:0.1:5.6];
+plot_mods2 = [6.5:0.1:7.6];
 colorss1 = [0.8 0.8 1; 1 0.8 0.8; 0 0.6906 0.5];
 colorss2 = [0 0 1; 1 0 0; 0 0.3906 0];
 
-
-close
-figure(2)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-hold on
-h = subplot(1,1,1);
-for month_ind = [3,9]
-
-    
-    % ________ Calculate the observational Sensitivity _________ % 
-    obs_sens = [];
-    obs_sens_hold = [];
-    clear coefficients
-    for nn = [1,3:6]    
-        for m = [3:6]
-            GT = global_mean_redshaped{nn};
-            GT = movmean(GT, movmean_ind);        % Apply a running mean of 20 years
-            GT = GT(index_1974_2014);             % Extract 1979-2014 period
-
-            SIA_obs = monthly_obs_SIA{m}{month_ind};
-            SIA_obs = movmean(SIA_obs, movmean_ind);
-            SIA_obs = SIA_obs(index_1974_2014);
-
-            ind = isnan(SIA_obs);
-            if isempty(ind) ~= 1
-                SIA_obs = SIA_obs(ind==0);
-                GT = GT(ind==0);
-            else
-                SIA_obs = SIA_obs;
-                GT = GT;
-            end
-
-            coefficients = polyfit(GT, SIA_obs, 1);         % Extract linear regression coefficients that are the sensitivity
-            obs_sens_hold{nn,m} = coefficients(1);
-        end
-    end
-    obs_sens = cell2mat(obs_sens_hold);
-
-
-
-
-    % Calculate the Sensitivity: OCCAA Emulator
-    clear coefficients
-    magicc_sens_hold = [];
-    OCCAA_sens = [];
-    for n = 1:1
-        for j = 1:12
-            for ii = 1:600
-                SIA_emul = sia_mon_rearrange_OCCAA{n}(:,month_ind);
-                SIA_emul = movmean(SIA_emul{j}(ii,:), movmean_ind);
-                SIA_emul = SIA_emul(index_1974_2014);
-
-                GT = GT_ensembles{n};
-                GT_emul = movmean(GT(ii,:), movmean_ind);
-                GT_emul = GT_emul(index_1974_2014);
-
-                coefficients = polyfit(GT_emul, SIA_emul, 1);
-                magicc_sens_hold{ii,j} = coefficients(1);
-            end  
-        end
-        OCCAA_sens{n} = cell2mat(magicc_sens_hold);   
-    end
-
-
-
-    % Calculate the Sensitivity: OC Emulator 
-    clear coefficients
-    magicc_sens_hold = [];
-    OC_sens = [];
-    magicc_sens_hold_1 = [];
-    for n = 1:1
-        SIA = sia_mon_rearrange_final_OC{n}(:, month_ind);
-        for j = 1:12
-            for ii = 1:600
-                SIA_emul = movmean(SIA{j}(ii,:), movmean_ind);
-                SIA_emul = SIA_emul(index_1974_2014);
-
-                GT = GMST_random_arrangment{n};
-                GT_emul = movmean(GT(ii,:), movmean_ind); 
-                GT_emul = GT_emul(index_1974_2014);
-
-                coefficients = polyfit(GT_emul, SIA_emul, 1);
-                magicc_sens_hold_1{ii} = coefficients(1);
-            end  
-            magicc_sens_hold{j} = (cell2mat(magicc_sens_hold_1))';
-        end
-        OC_sens{n} = cell2mat(magicc_sens_hold(:));   
-    end
-
-
-
-
-
-    % Calculate the CMIP6 Sensitivity
-    clear coefficients
-    cmip6_sens = [];
-    cmip6_sens_hold = [];
-    for n = 1
-        for j = 1:12
-            SIA_cmip6 = updated_hist_sia_annual_curve_all_models{j,n}(:,month_ind);
-            SIA_cmip6 = movmean(SIA_cmip6, movmean_ind);
-            SIA_cmip6 = SIA_cmip6(index_1974_2014);
-
-            GT_cmip6 = tas_global{n}{j};
-            GT_cmip6 = movmean(GT_cmip6, movmean_ind);
-            GT_cmip6 = GT_cmip6(index_1974_2014);
-
-            coefficients = polyfit(GT_cmip6, SIA_cmip6, 1);
-            cmip6_sens_hold{j,n} = coefficients(1); 
-        end
-    end
-    cmip6_sens = cell2mat(cmip6_sens_hold);
-
-
-
-    % ______ MAKE BOXPLOT _______ %     
-    if month_ind == 3
-        ind = 0.25;
-    elseif month_ind == 9
-        ind = 0.55;
-    end
-    
-    % Plot observational sensitivity
-    obs_sens_bp = boxplot(obs_sens(:), 'positions', [ind-0.06], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
-    hAx = gca;
-    lines = hAx.Children;
-    lines = lines(1);
-    bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile(obs_sens(:), 1.0);   % Set quartile range to show in boxplot
-    bp_cmip6.YData(1,2) = quantile(obs_sens(:), 0.0);
-
-    
-    
-    % Dirk's Sens Data (SIMIP Community, 2020)
-    if month_ind == 3
-        boxplot([-1.35, -1.85], 'positions', [ind+0.06], 'color', colorss1(1,:), 'Labels', [' '], 'plotstyle','compact'); hold on % MAGICC using the UPPER BOUNDARY of our observationally constrained AA
-    else
-        boxplot([-3.81, -4.39], 'positions', [ind+0.06], 'color', colorss1(1,:), 'Labels', [' '], 'plotstyle','compact'); hold on % MAGICC using the UPPER BOUNDARY of our observationally constrained AA
-    end
-
-
-    % Plot CMIP6 sensitivity    
-    boxplot(cmip6_sens, 'positions', [ind-0.03], 'color', [1 0 0], 'plotstyle','compact'); hold on  
-    hAx = gca;
-    lines = hAx.Children;
-    lines = lines(1);
-    bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile( cmip6_sens, 0.25);      % specify to plot interquartile range
-    bp_cmip6.YData(1,2) = quantile( cmip6_sens, 0.75);
-
-
-        
-    % Plot sensitivity from OCCAA emulator  
-    cmip6_aa_sens = boxplot(OCCAA_sens{1}(:), 'positions', [ind], 'color', [0    0.5000    0.5000], 'Labels', [' '], 'plotstyle','compact'); hold on % MAGICC using the UPPER BOUNDARY of our observationally constrained AA
-    set(cmip6_aa_sens(length(cmip6_aa_sens),:),'Visible','off')     % Remove the outliers
-    hAx = gca;
-    lines = hAx.Children;
-    lines = lines(1);
-    bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile( OCCAA_sens{1}(:), 0.25);      % specify to plot interquartile range
-    bp_cmip6.YData(1,2) = quantile( OCCAA_sens{1}(:), 0.75);
-
-
-    % Plot sensitivity from OC emulator  
-    SIE_constrained_bp = boxplot(OC_sens{1}, 'positions', [ind+0.03], 'color', colorss1(2,:), 'Labels', [' '], 'plotstyle','compact'); hold on % MAGICC using the UPPER BOUNDARY of our observationally constrained AA
-    set(SIE_constrained_bp(length(SIE_constrained_bp),:),'Visible','off')     % Remove the outliers
-    hAx = gca;
-    lines = hAx.Children;
-    lines = lines(1);
-    bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile( OC_sens{1}, 0.25);  % specify to plot interquartile range
-    bp_cmip6.YData(1,2) = quantile( OC_sens{1}, 0.75);
-
-
-
-    
-
-    % _____ Plot Edits ____ % 
-    a = get(get(gca,'children'),'children');    % Set width of boxplots
-    for ii = 1:length(a)
-        t = get(a{ii},'tag'); 
-        idx=strcmpi(t,'box'); 
-        a_new = a{ii};
-        boxes=a_new(idx);         
-        set(boxes,'linewidth',20); 
-    end
-
-    
-    % Add plot labels and edits
-    sgtitle([num2str(years(index_1974_2014(1))), '-', num2str(years(index_1974_2014(end))), ' Sensitivity (dSIA/dGTA)'], 'fontsize', 28, 'interpreter', 'none')
-
-    if ismember(month_ind, [1,5,9])
-        ylabel('million km^2/ \circC')
-    end
-    set(gca, 'fontsize', 22)
-        
-    
-    length_curve_2 = 0.7;
-    xlim([0 length_curve_2])    
-    ylim([-6 0])    
-    xticks([0.25,0.55])
-    xticklabels(string({month_label{3}, month_label{9}}));  % Add month labels to each cluster of boxplots    
-
- 
-    grid
-    hold on
-    
+xticks_hold = [0];
+% Get xticks ready
+for ii = 1:12
+    xticks_hold = [xticks_hold, ii-0.2, ii, ii+0.2];
 end
 
-h.Position = [0.3 0.075 0.4 0.85];      % Change size of plot
-    
-grid 
-hLegend = legend(findall(gca,'Tag','Box'), {'OC Emulator', 'OCCAA Emulator',  'CMIP6', 'Niederdrenk and Notz, (2018)', 'Observations'}, 'location', 'southwest', 'fontsize', 18);
-hLegend.Box = 'off'; 
+% Initialise empty vectors
+obs_sens = [];
+obs_sens_co2 = [];
+emul_cmip6_sens_co2 = [];
+emul_cmip6_sens = [];
+cmip6_sens = [];
+cmip6_sens_co2 = [];
+magicc_sens_OCCAA_co2 = [];
+magicc_sens_OCCAA = [];
+magicc_sens_OC_co2 = [];
+magicc_sens_OC = [];
 
-% Save
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[51 30]);
+clc
+for month_ind = [3,9]
 
-% % Save Normalised
-% temp=['Fig2_16', '.pdf']; 
-% saveas(gca,temp); 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% ______ Fig A.10 (Chapter 2, Supplementary) (all months) _______ % 
-
-
-% Initialise Plot  
-movmean_ind = 20;
-years = 1850:2300;
-index_1974_2014 = [130:165]; % to extract 1979-2014
-
-% Get colour RGB triplets
-colorss1 = [0.8 0.8 1; 1 0.8 0.8; 0 0.6906 0.5];
-colorss2 = [0 0 1; 1 0 0; 0 0.3906 0];
-
-
-
-
-close
-figure(2)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-hold on
-h = subplot(1,1,1);
-for month_ind = [1:12]
-    
-    
-    %  _______ Calculate Sensitivity ______ % 
-
-    % Calculate the observational Sensitivity 
-    obs_sens = [];
+    % ________ OBS ________ %
+    % Calculate the observational Sensitivity: GW
     obs_sens_hold = [];
     clear coefficients
     for nn = [1,3:6]    
@@ -313,68 +65,89 @@ for month_ind = [1:12]
             obs_sens_hold{nn,m} = coefficients(1);
         end
     end
-    obs_sens = cell2mat(obs_sens_hold);
+    obs_sens{month_ind} = cell2mat(obs_sens_hold);
 
 
+    % Calculate the observational Sensitivity: co2
+    obs_sens_hold = [];
+    clear coefficients 
+    for m = [3:6]
+        GT = cumsum_co2_emissions_int{1}(101:351);
+        GT = movmean(GT, movmean_ind);
+        GT = GT(index_1974_2014);
 
+        SIA_obs = monthly_obs_SIA{m}{month_ind};
+        SIA_obs = movmean(SIA_obs, movmean_ind);
+        SIA_obs = SIA_obs(index_1974_2014);
 
-    % Calculate the Sensitivity: OCCAA Emulator
-    clear coefficients
-    magicc_sens_hold = [];
-    OCCAA_sens = [];
-    for n = 1:1
-        for j = 1:12
-            for ii = 1:600
-                SIA_emul = sia_mon_rearrange_OCCAA{n}(:,month_ind);
-                SIA_emul = movmean(SIA_emul{j}(ii,:), movmean_ind);
-                SIA_emul = SIA_emul(index_1974_2014);
-
-                GT = GT_ensembles{n};
-                GT_emul = movmean(GT(ii,:), movmean_ind);
-                GT_emul = GT_emul(index_1974_2014);
-
-                coefficients = polyfit(GT_emul, SIA_emul, 1);
-                magicc_sens_hold{ii,j} = coefficients(1);
-            end  
+        ind = isnan(SIA_obs);
+        if isempty(ind) ~= 1
+            SIA_obs = SIA_obs(ind==0);
+            GT = GT(ind==0);
+        else
+            SIA_obs = SIA_obs;
+            GT = GT;
         end
-        OCCAA_sens{n} = cell2mat(magicc_sens_hold);   
+
+        coefficients = polyfit(GT, SIA_obs, 1);
+        obs_sens_hold{m} = coefficients(1);
     end
+    obs_sens_co2_hold = cell2mat(obs_sens_hold);
+    obs_sens_co2{month_ind} = (obs_sens_co2_hold .* 1e12) / 1e9;
+
+    % ________ OBS END ________ %
 
 
 
 
-    % Calculate the Sensitivity: OC Emulator 
+    % ________ EMUL CMIP6 SENS ________ %
+    % % Calculate the Emulated Sensitivity: GW
+    % clear coefficients
+    % emul_cmip6_sens_hold = [];
+    % for n = 1
+    %     for j = 1:12
+    %         SIA_cmip6 = sia_emul_final_NO_BC{n}{j,month_ind};
+    %         SIA_cmip6 = movmean(SIA_cmip6, movmean_ind);
+    %         SIA_cmip6 = SIA_cmip6(index_1974_2014);
+    % 
+    %         GT_cmip6 = tas_global{n}{j};
+    %         GT_cmip6 = movmean(GT_cmip6, movmean_ind);
+    %         GT_cmip6 = GT_cmip6(index_1974_2014);
+    % 
+    %         coefficients = polyfit(GT_cmip6, SIA_cmip6, 1);
+    %         emul_cmip6_sens_hold{j,n} = coefficients(1); 
+    %     end
+    % end
+    % emul_cmip6_sens{month_ind} = cell2mat(emul_cmip6_sens_hold);
+
+
+        
+    % Calculate the Emulated Sensitivity: CO2
+    % clear coefficients
+    % emul_cmip6_sens_hold = [];
+    % for n = 1
+    %     for j = 1:12
+    %         SIA_cmip6 = sia_emul_final_NO_BC{n}{j,month_ind};
+    %         SIA_cmip6 = movmean(SIA_cmip6, movmean_ind);
+    %         SIA_cmip6 = SIA_cmip6(index_1974_2014);
+    % 
+    %         GT_cmip6 = cumsum_co2_emissions_int{n}(101:351);
+    %         GT_cmip6 = movmean(GT_cmip6, movmean_ind);
+    %         GT_cmip6 = GT_cmip6(index_1974_2014);
+    % 
+    %         coefficients = polyfit(GT_cmip6, SIA_cmip6, 1);
+    %         emul_cmip6_sens_hold{j,n} = coefficients(1); 
+    %     end
+    % end
+    % emul_cmip6_sens_co2_hold = cell2mat(emul_cmip6_sens_hold);
+    % emul_cmip6_sens_co2{month_ind} = (emul_cmip6_sens_co2_hold .* 1e12) / 1e9;
+    % ________ EMUL CMIP6 SENS END ________ %
+
+
+
+    % ________ CMIP6 SENS ________ %
+    % Calculate the CMIP6 Sensitivity: GW
     clear coefficients
-    magicc_sens_hold = [];
-    OC_sens = [];
-    magicc_sens_hold_1 = [];
-    for n = 1:1
-        SIA = sia_mon_rearrange_final_OC{n}(:, month_ind);
-        for j = 1:12
-            for ii = 1:600
-                SIA_emul = movmean(SIA{j}(ii,:), movmean_ind);
-                SIA_emul = SIA_emul(index_1974_2014);
-
-                GT = GMST_random_arrangment{n};
-                GT_emul = movmean(GT(ii,:), movmean_ind); 
-                GT_emul = GT_emul(index_1974_2014);
-
-                coefficients = polyfit(GT_emul, SIA_emul, 1);
-                magicc_sens_hold_1{ii} = coefficients(1);
-            end  
-            magicc_sens_hold{j} = (cell2mat(magicc_sens_hold_1))';
-        end
-        OC_sens{n} = cell2mat(magicc_sens_hold(:));   
-    end
-
-
-
-
-
-
-    % Calculate the CMIP6 Sensitivity
-    clear coefficients
-    cmip6_sens = [];
     cmip6_sens_hold = [];
     for n = 1
         for j = 1:12
@@ -390,71 +163,415 @@ for month_ind = [1:12]
             cmip6_sens_hold{j,n} = coefficients(1); 
         end
     end
-    cmip6_sens = cell2mat(cmip6_sens_hold);
+    cmip6_sens{month_ind} = cell2mat(cmip6_sens_hold);
 
 
+        
+    % Calculate the CMIP6 Sensitivity: CO2
+    clear coefficients
+    cmip6_sens_hold = [];
+    for n = 1
+        for j = 1:12
+            SIA_cmip6 = updated_hist_sia_annual_curve_all_models{j,n}(:,month_ind);
+            SIA_cmip6 = movmean(SIA_cmip6, movmean_ind);
+            SIA_cmip6 = SIA_cmip6(index_1974_2014);
 
-    % _____ Plot sensitivity as boxplots ______ %
+            GT_cmip6 = cumsum_co2_emissions_int{n}(101:351);
+            GT_cmip6 = movmean(GT_cmip6, movmean_ind);
+            GT_cmip6 = GT_cmip6(index_1974_2014);
+
+            coefficients = polyfit(GT_cmip6, SIA_cmip6, 1);
+            cmip6_sens_hold{j,n} = coefficients(1); 
+        end
+    end
+    cmip6_sens_co2_hold = cell2mat(cmip6_sens_hold);
+    cmip6_sens_co2{month_ind} = (cmip6_sens_co2_hold .* 1e12) / 1e9;
+    % ________ CMIP6 SENS END ________ %
+
+
     
-    % Plot Observational Sensitivity
-    boxplot(obs_sens(:), 'positions', [month_ind-0.3], 'color', [0 0 0]+0.7, 'plotstyle', 'compact');
+    % ________ OCCAA SENS ________ %
+    % CO2
+    clear coefficients
+    magicc_sens_hold_co2 = [];
+    for n = 1
+        for j = 1:12
+            for ii = 1:600
+                SIA_emul = sia_mon_rearrange_final_CMIP6_AA{n}(:,month_ind);
+                SIA_emul = movmean(SIA_emul{j}(ii,:), movmean_ind);
+                SIA_emul = SIA_emul(index_1974_2014);
+
+                GT_emul = cumsum_co2_emissions_int{n}(101:351);
+                GT_emul = movmean(GT_emul, movmean_ind);
+                GT_emul = GT_emul(index_1974_2014);
+
+                coefficients = polyfit(GT_emul, SIA_emul, 1);
+                magicc_sens_hold_co2{ii,j} = coefficients(1);
+            end  
+        end  
+    end
+    magicc_sens_OCCAA_co2_hold = cell2mat(magicc_sens_hold_co2); 
+    magicc_sens_OCCAA_co2{month_ind} = (magicc_sens_OCCAA_co2_hold .* 1e12) / 1e9;
+
+    
+    % GW
+    clear coefficients
+    magicc_sens_hold = [];
+    for n = 1
+        for j = 1:12
+            for ii = 1:600
+                SIA_emul = sia_mon_rearrange_final_CMIP6_AA{n}(:,month_ind);
+                SIA_emul = movmean(SIA_emul{j}(ii,:), movmean_ind);
+                SIA_emul = SIA_emul(index_1974_2014);
+
+                GT = GT_ensembles{n};
+                GT_emul = movmean(GT(ii,:), movmean_ind);
+                GT_emul = GT_emul(index_1974_2014);
+
+                coefficients = polyfit(GT_emul, SIA_emul, 1);
+                magicc_sens_hold{ii,j} = coefficients(1);
+            end  
+        end
+    end
+    magicc_sens_OCCAA{month_ind} = cell2mat(magicc_sens_hold);   
+    % ________ OCCAA SENS END ________ %
+
+
+
+    % ________ OC SENS ________ %
+    % CO2
+    clear coefficients
+    magicc_sens_hold_co2 = [];
+    for n = 1
+        for j = 1:12
+            for ii = 1:600
+                SIA_emul = sia_mon_rearrange_final_MCMC{n}(:,month_ind);
+                SIA_emul = movmean(SIA_emul{j}(ii,:), movmean_ind);
+                SIA_emul = SIA_emul(index_1974_2014);
+
+                GT_emul = cumsum_co2_emissions_int{n}(101:351);
+                GT_emul = movmean(GT_emul, movmean_ind);
+                GT_emul = GT_emul(index_1974_2014);
+
+                coefficients = polyfit(GT_emul, SIA_emul, 1);
+                magicc_sens_hold_co2{ii,j} = coefficients(1);
+            end  
+        end  
+    end
+    magicc_sens_OC_co2_hold = cell2mat(magicc_sens_hold_co2); 
+    magicc_sens_OC_co2{month_ind} = (magicc_sens_OC_co2_hold .* 1e12) / 1e9;
+    
+
+    % GW
+    clear coefficients
+    magicc_sens_hold = [];
+    for n = 1
+        for j = 1:12
+            for ii = 1:600
+                SIA_emul = sia_mon_rearrange_final_MCMC{n}(:,month_ind);
+                SIA_emul = movmean(SIA_emul{j}(ii,:), movmean_ind);
+                SIA_emul = SIA_emul(index_1974_2014);
+
+                GT = GT_ensembles{n};
+                GT_emul = movmean(GT(ii,:), movmean_ind);
+                GT_emul = GT_emul(index_1974_2014);
+
+                coefficients = polyfit(GT_emul, SIA_emul, 1);
+                magicc_sens_hold{ii,j} = coefficients(1);
+            end  
+        end
+    end
+    magicc_sens_OC{month_ind} = cell2mat(magicc_sens_hold);
+    % ________ OC SENS END ________ %
+
+end
+
+
+
+%% ________ PLOT SENSITIVITIY ________ %%
+
+mods_legend = [];
+
+close; clc
+figure(2)
+set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
+hold on
+
+%________GW PLOTS________%
+for month_ind = [3,9]
+
+    hold on
+    h = subplot(1,2,1);
+    
+    if month_ind == 3
+        ind = 0.2;
+    else
+        ind = 0.55; 
+    end
+
+    % Dirk's 
+    if month_ind == 9
+        boxplot([-3.81, -4.39], 'positions', [ind-0.045-0.045], 'color', [0    0.5000    0.5000], 'Labels', [' '], 'plotstyle','compact'); hold on 
+    end
+
+  
+    
+    
+    % OBS GMST
+    if month_ind == 9
+        % Plausible range
+        boxplot([-2.73, -5.28], 'positions', [ind-0.045], 'color', colorss1(2,:), 'plotstyle','compact'); hold on 
+
+        % Plausible range
+        % std_deviation = std(cmip6_sens{month_ind}, 'omitnan');
+        % two_std_devs = 1 * std_deviation;
+        % March_med = median(obs_sens{month_ind}(:), 'omitnan');
+        % boxplot([March_med-two_std_devs, March_med+two_std_devs], 'positions', [ind-0.045-0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on 
+
+        % Actual obs
+        obs_sens_bp = boxplot(obs_sens{month_ind}(:), 'positions', [ind], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
+        hAx = gca;
+        lines = hAx.Children;
+        lines = lines(1);
+        bp_cmip6 = findobj(lines, 'tag', 'Box');
+        bp_cmip6.YData(1,1) = quantile(obs_sens{month_ind}(:), 0.25);
+        bp_cmip6.YData(1,2) = quantile(obs_sens{month_ind}(:), 0.75);
+    else
+        % % Plausible range
+        % std_deviation = std(cmip6_sens{month_ind}, 'omitnan');
+        % two_std_devs = 2 * std_deviation;
+        % March_med = median(obs_sens{month_ind}(:), 'omitnan');
+        % boxplot([March_med-two_std_devs, March_med+two_std_devs], 'positions', [ind-0.045-0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on 
+
+        % Actual obs
+        obs_sens_bp = boxplot(obs_sens{month_ind}(:), 'positions', [ind], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
+        hAx = gca;
+        lines = hAx.Children;
+        lines = lines(1);
+        bp_cmip6 = findobj(lines, 'tag', 'Box');
+        bp_cmip6.YData(1,1) = quantile(obs_sens{month_ind}(:), 1.0);
+        bp_cmip6.YData(1,2) = quantile(obs_sens{month_ind}(:), 0.0);
+    end
+
+ 
+    
+        
+    % CMIP6 GMST 
+    boxplot(cmip6_sens{month_ind}, 'positions', [ind+0.045], 'color', [1 0 0], 'plotstyle','compact'); hold on    % CMIP6
     hAx = gca;
     lines = hAx.Children;
     lines = lines(1);
     bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile(obs_sens(:), 1.0);
-    bp_cmip6.YData(1,2) = quantile(obs_sens(:), 0.0);
+    bp_cmip6.YData(1,1) = quantile( cmip6_sens{month_ind}, 0.25);
+    bp_cmip6.YData(1,2) = quantile( cmip6_sens{month_ind}, 0.75);
     
-
-    % Plot CMIP6 Sensitivity
-    boxplot(cmip6_sens, 'positions', [month_ind-0.15], 'color', [1 0 0], 'plotstyle','compact'); hold on  
     
+    % boxplot(emul_cmip6_sens{month_ind}, 'positions', [ind+0.03], 'color', colorss1(2,:), 'plotstyle','compact'); hold on    % CMIP6
+    % hAx = gca;
+    % lines = hAx.Children;
+    % lines = lines(1);
+    % bp_cmip6 = findobj(lines, 'tag', 'Box');
+    % bp_cmip6.YData(1,1) = quantile( emul_cmip6_sens{month_ind}, 0.25);
+    % bp_cmip6.YData(1,2) = quantile( emul_cmip6_sens{month_ind}, 0.75);
 
-    % Plot OCCAA Sensitivity
-    bp_cmip6_AA = boxplot(OCCAA_sens{1}(:), 'positions', [month_ind], 'color', [0    0.5000    0.5000], 'Labels', [' '], 'plotstyle','compact'); hold on
-    set(bp_cmip6_AA(length(bp_cmip6_AA),:),'Visible','off')
+       
+    % % OCCAA GMST 
+    % OCCAA_GMST = boxplot(magicc_sens_OCCAA{month_ind}(:), 'positions', [ind+0.045], 'color', [0    0.5000    0.5000], 'plotstyle','compact'); hold on  
+    % set(OCCAA_GMST(length(OCCAA_GMST),:),'Visible','off')     
+    % hAx = gca;
+    % lines = hAx.Children;
+    % lines = lines(1);
+    % bp_cmip6 = findobj(lines, 'tag', 'Box');
+    % bp_cmip6.YData(1,1) = quantile( magicc_sens_OCCAA{month_ind}(:), 0.25);
+    % bp_cmip6.YData(1,2) = quantile( magicc_sens_OCCAA{month_ind}(:), 0.75);
 
+ 
+    % OC GMST 
+    OC_GMST = boxplot(magicc_sens_OC{month_ind}(:), 'positions', [ind+0.09], 'color', colorss1(1,:), 'plotstyle','compact'); hold on   
+    set(OC_GMST(length(OC_GMST),:),'Visible','off')  
+    hAx = gca;
+    lines = hAx.Children;
+    lines = lines(1);
+    bp_cmip6 = findobj(lines, 'tag', 'Box');
+    bp_cmip6.YData(1,1) = quantile( magicc_sens_OC{month_ind}(:), 0.25);
+    bp_cmip6.YData(1,2) = quantile( magicc_sens_OC{month_ind}(:), 0.75);   
 
-    % Plot OC Sensitivity
-    bp_obs_AA = boxplot(OC_sens{1}(:), 'positions', [month_ind+0.15], 'color', colorss1(2,:), 'Labels', [' '], 'plotstyle','compact'); hold on
-    set(bp_obs_AA(length(bp_obs_AA),:),'Visible','off')
-  
+       
+   
     
-
-
-    % _____ Plot Edits ____ % 
-    a = get(get(gca,'children'),'children');        % Set width of boxplots
+    
+    % Set width of boxplots
+    a = get(get(gca,'children'),'children');  
     for ii = 1:length(a)
         t = get(a{ii},'tag'); 
         idx=strcmpi(t,'box'); 
         a_new = a{ii};
         boxes=a_new(idx);         
-        set(boxes,'linewidth',10); 
+        set(boxes,'linewidth',20); 
+    end
+    
+    % Add plot labels and edits
+    title([num2str(years(index_1974_2014(1))), '-', num2str(years(index_1974_2014(end))), ' Sensitivity (dSIA/dGTA)'], 'fontsize', 22, 'interpreter', 'none')
+    
+    if ismember(month_ind, [1,5,9])
+        ylabel('million km^2/ \circC')
+    end
+    
+    
+end
+h.Position(1) = h.Position(1) + 0.06;
+set(gca, 'fontsize', 20)
+    
+xticks([0.2, 0.5])
+xticklabels( [string({month_label{3}}), string({month_label{9}})] );
+length_curve_2 = 0.75;
+xlim([0 length_curve_2])    
+ylim([-6.8 0])  
+grid
+h.Position(4) = h.Position(4) - 0.1;
+h.Position(3) = h.Position(3) - 0.03;
+h.Position(3) = h.Position(3) - 0.03;
+
+% hLegend = legend(findall(gca,'Tag','Box'), {'OC Emulator', 'OCCAA Emulator', 'CMIP6', 'Niederdrenk and Notz, (2018)', 'Plausible Range (from Observations)'}, 'location', 'southwest', 'fontsize', 18);
+% hLegend.Box = 'off';
+
+hLegend = legend(findall(gca,'Tag','Box'), {'This Study', 'CMIP6', 'Observations', 'Plausible Range', 'Niederdrenk and Notz, (2018)'}, 'location', 'southwest', 'fontsize', 16);
+hLegend.Box = 'off';
+
+
+
+
+%________CO2 PLOTS________%
+for month_ind = [3,9]   
+
+    h = subplot(1,2,2);
+
+    if month_ind == 3
+        ind = 0.2;
+    else
+        ind = 0.55; 
+    end
+    
+    % OBS CO2
+    if month_ind == 9
+        boxplot([-1.36, -4.1], 'positions', [ind-0.045-0.045], 'color', colorss1(2,:), 'plotstyle','compact'); hold on
+
+        obs_sens_bp = boxplot(obs_sens_co2{month_ind}(:), 'positions', [ind-0.045], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
+        hAx = gca;
+        lines = hAx.Children;
+        lines = lines(1); 
+        bp_cmip6 = findobj(lines, 'tag', 'Box');
+        bp_cmip6.YData(1,1) = quantile(obs_sens_co2{month_ind}(:), 0.25);
+        bp_cmip6.YData(1,2) = quantile(obs_sens_co2{month_ind}(:), 0.75);
+
+    else
+        obs_sens_bp = boxplot(obs_sens_co2{month_ind}(:), 'positions', [ind-0.045], 'color', [0 0 0]+0.7, 'plotstyle', 'compact'); hold on
+        hAx = gca;
+        lines = hAx.Children;
+        lines = lines(1); 
+        bp_cmip6 = findobj(lines, 'tag', 'Box');
+        bp_cmip6.YData(1,1) = quantile(obs_sens_co2{month_ind}(:), 1.0);
+        bp_cmip6.YData(1,2) = quantile(obs_sens_co2{month_ind}(:), 0.0);
+
+        % std_deviation = std(cmip6_sens_co2{month_ind}, 'omitnan');
+        % two_std_devs = 2 * std_deviation;
+        % March_med = median(obs_sens_co2{month_ind}(:), 'omitnan');
+        % boxplot([March_med-two_std_devs, March_med+two_std_devs], 'positions', [ind-0.045-0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on 
     end
 
     
+    
+    % CMIP6 CO2
+    boxplot(cmip6_sens_co2{month_ind}, 'positions', [ind], 'color', [1 0 0], 'plotstyle','compact'); hold on    % CMIP6
+    hAx = gca;
+    lines = hAx.Children;
+    lines = lines(1);
+    bp_cmip6 = findobj(lines, 'tag', 'Box');
+    bp_cmip6.YData(1,1) = quantile( cmip6_sens_co2{month_ind}, 0.25);
+    bp_cmip6.YData(1,2) = quantile( cmip6_sens_co2{month_ind}, 0.75);
+    
+    
+    % boxplot(emul_cmip6_sens_co2{month_ind}, 'positions', [ind+0.03], 'color', colorss1(2,:), 'plotstyle','compact'); hold on    % CMIP6
+    % hAx = gca;
+    % lines = hAx.Children;
+    % lines = lines(1);
+    % bp_cmip6 = findobj(lines, 'tag', 'Box');
+    % bp_cmip6.YData(1,1) = quantile( emul_cmip6_sens_co2{month_ind}, 0.25);
+    % bp_cmip6.YData(1,2) = quantile( emul_cmip6_sens_co2{month_ind}, 0.75);
+
+   
+    
+    % % OCCAA CO2
+    % OCCAA_CO2 = boxplot(magicc_sens_OCCAA_co2{month_ind}(:), 'positions', [ind+0.045], 'color', [0    0.5000    0.5000], 'plotstyle','compact'); hold on
+    % set(OCCAA_CO2(length(OCCAA_CO2),:),'Visible','off')     
+    % hAx = gca;
+    % lines = hAx.Children;
+    % lines = lines(1);
+    % bp_cmip6 = findobj(lines, 'tag', 'Box');
+    % bp_cmip6.YData(1,1) = quantile( magicc_sens_OCCAA_co2{month_ind}(:), 0.25);
+    % bp_cmip6.YData(1,2) = quantile( magicc_sens_OCCAA_co2{month_ind}(:), 0.75); 
+
+    
+    % OC CO2
+    % OC_CO2 = boxplot(magicc_sens_OC_co2{month_ind}(:), 'positions', [ind+0.045], 'color', colorss1(2,:), 'plotstyle','compact'); hold on
+    OC_CO2 = boxplot(magicc_sens_OC_co2{month_ind}(:), 'positions', [ind+0.045], 'color', colorss1(1,:), 'plotstyle','compact'); hold on
+    set(OC_CO2(length(OC_CO2),:),'Visible','off')     
+    hAx = gca;
+    lines = hAx.Children;
+    lines = lines(1);
+    bp_cmip6 = findobj(lines, 'tag', 'Box');
+    bp_cmip6.YData(1,1) = quantile( magicc_sens_OC_co2{month_ind}(:), 0.25);
+    bp_cmip6.YData(1,2) = quantile( magicc_sens_OC_co2{month_ind}(:), 0.75);
+    
+    
+    
+    
+    % Set width of boxplots
+    a = get(get(gca,'children'),'children');  
+    for ii = 1:length(a)
+        t = get(a{ii},'tag'); 
+        idx=strcmpi(t,'box'); 
+        a_new = a{ii};
+        boxes=a_new(idx);         
+        set(boxes,'linewidth',20); 
+    end
+    
+    
     % Add plot labels and edits
-    text = [num2str(years(index_1974_2014(1))), '-', num2str(years(index_1974_2014(end))), ' Sensitivity (dSIA/dGTA) '];
-    ylabel([text, '(million km^2/ \circC)'])
-    set(gca, 'fontsize', 22)
-          
-    length_curve_2 = 13;
-    xlim([0 length_curve_2])    
-    ylim([-8 0])    
-    xticks([1:13])
-	xticklabels(string(month_label));
-    xtickangle(25) 
-    hold on
+    title([num2str(years(index_1974_2014(1))), '-', num2str(years(index_1974_2014(end))), ' Sensitivity (dSIA/dCO2)'], 'fontsize', 22, 'interpreter', 'none')
+    
+    if ismember(month_ind, [1,5,9])
+        ylabel('m^2/ t')
+    end
+
     
 end
-hLegend = legend(findall(gca,'Tag','Box'), {'OC Emulator', 'OCCAA Emulator', 'CMIP6', 'Observations'}, 'location', 'southwest');
-legend box off
-grid 
+h.Position(1) = h.Position(1) + 0.02;
+set(gca, 'fontsize', 20)
+    
+xticks([0.2, 0.5])
+xticklabels( [string({month_label{3}}), string({month_label{9}})] );
 
-% Save
+length_curve_2 = 0.75;
+xlim([0 length_curve_2])    
+ylim([-4.5 0])    
+grid
+h.Position(4) = h.Position(4) - 0.1;
+h.Position(3) = h.Position(3) - 0.03;
+h.Position(1) = h.Position(1) - 0.07;
+
+
+hLegend = legend(findall(gca,'Tag','Box'), {'This Study', 'CMIP6', 'Observations', 'Plausible Range'}, 'location', 'southwest', 'fontsize', 16);
+hLegend.Box = 'off';
+
+
+% Save Normalised
 set(gcf, 'PaperOrientation', 'landscape')
 set(gcf,'PaperSize',[51 30]);
 
-% % Save Normalised
-% temp=['SupFigA.10', '.pdf']; 
-% saveas(gca,temp); 
+% Save Normalised
+temp=['SENS_GMST_CO2_2', '.pdf']; 
+saveas(gca,temp); 
+
+
+
