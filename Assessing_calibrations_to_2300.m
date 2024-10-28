@@ -1,4 +1,4 @@
-%% Assessing Calibrations to 2300: Thesis Chapter 3
+%% Assessing Calibrations to 2300: Section 3.1
 
 
 %% Part 1: Extract temperature using ARO IPCC WG1 AR6 shape file
@@ -714,45 +714,6 @@ end
 
 
 
-%% Plot AA to 2300: Fig B.1 Supplementary Chapter 3
-
-close; clc
-figure(38)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-for j = 1:length(tas_global_2300_anom_ruby)                         % j = CMIP6 models used in this analysis                                        
-    
-    
-    rw = tas_global_2300_anom_ruby{j};                          % CMIP6 global temperature anomaly (1850:2100) - GMST
-    raa = aat_2300_anom_ruby{j};                  % CMIP6 Arctic annual surface air temperature anomaly (1850:2100) - AAST
-    
-    
-    % Calculate the Arctic annual temperature anomaly         
-    plot(1850:2300, movmean(raa ./ rw', 20), 'linewidth', 2 ); hold on
-   
-    
-end
-grid
-xlim([2005, 2300])
-ax = gca; ax.FontSize = 18;
-xlabel( 'Year' )
-ylabel( 'Arctic Amplification Factor' )
-tt2 = legend(amst_2300_models);
-tt2.Box = 'off';
-
-
-% % Save
-% temp=[' Arctic Amplificatio 2300 ','.png'];  
-% saveas(gca,temp);
-
-
-% set(gcf, 'PaperOrientation', 'landscape')
-% set(gcf,'PaperSize',[53 29.7000]);
-
-% % Save
-% temp=['FigB.1', '.pdf']; 
-% saveas(gca,temp); 
-
-
 
 
 
@@ -841,189 +802,6 @@ cellfun(@size, AAT_emulation_absolute_2300, 'UniformOutput', false)
 
 
 
-
-%% ARCTIC AMPLIFICATION 2300 PLOT: Fig3.2 Thesis, Chapter 3, Section 3.3.1.1
-
-close all
-figure(39)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-clc
-
-clear lines
-cols = lines(12);
-for j = 1:length(aat_2300_anom_ruby)                                    % j = CMIP6 models used in this analysis                                        
-       
-    rw = tas_global_2300_anom_ruby{j};                          % CMIP6 global temperature anomaly (1850:2100) - GMST
-    raa = aat_2300_anom_ruby{j};                  % CMIP6 Arctic annual surface air temperature anomaly (1850:2100) - AAST
-
-    
-    aa(j) = scatter( rw, raa, 'markerfacecolor', cols(j,:), 'markeredgecolor', cols(j,:) ); hold on
-
-    aa2(1) = scatter( rw(1:251), raa(1:251), 'markerfacecolor', [0 0 0]+0.2, 'markeredgecolor', [0 0 0]+0.2 ); hold on
-
-end
-grid
-xlabel('  Global-Mean Temperature Anomaly ' ); 
-ylabel('Arctic Annual Temperature Anomaly' );
-ax = gca; ax.FontSize = 20;
-tt2 = legend([aa,aa2], [amst_2300_models, "AA to 2100"], 'location', 'southeast');
-tt2.Box = 'off';
-
-
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[53 29.7000]);
-
-% % Save
-% temp=['Fig3.2', '.pdf']; 
-% saveas(gca,temp); 
-
-
-
-%% Plot Percentile Shading for Fig 3.3, Chapter 3, Section 3.3.1.1
-
-threshold = [5 95];
-close all
-figure(40)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-clc
-
-hnew_mean_emul = [];
-hnew_VL_range_emul = [];
-hnew_VL_range_cmip6 = [];
-hnew_mean_cmip6 = [];
-
-cmip6_aat = {aat_2300_anom_ruby; aat_2300_absolute_ruby};
-emul_aat = {AAT_emulation_anomaly_2300; AAT_emulation_absolute_2300};
-for tt = 1:2                                                       % when tt=1 we plot the anomaly temperature and tt=2 we plot the absolute
-
-    h = subplot(1,2,tt); 
-
-    EMUL = emul_aat{tt};
-    CMIP6 = cmip6_aat{tt};
-   
-
-    % Initialise the mean of emulation and CMIP6
-    emul_mean = mean(cell2mat(EMUL));
-    cmip6_mean = mean(cell2mat(CMIP6)); 
-
-    
-    % Initialise the year to plot the timeseries
-    x = 1850:2300;
-
-    
-    % Calculate the likely percentile range
-    percentile_Emul = prctile(cell2mat(EMUL), threshold);      % Emulation
-    percentile_CMIP6 = prctile(cell2mat(CMIP6), threshold);    % CMIP6
-
-    
-    % Initialise the percentile range to plot the shaded likely range 
-    curve1_emul = percentile_Emul(2,:);
-    curve2_emul = percentile_Emul(1,:);
-
-
-    curve3_cmip6 = percentile_CMIP6(2,:);
-    curve4_cmip6 = percentile_CMIP6(1,:);
-
-
-    % Plot the shaded area between the upper and lower likely percentiles
-    x2 = [x, fliplr(x)];
-    inBetween_emul = [curve1_emul, fliplr(curve2_emul)];
-    inBetween_cmip6 = [curve3_cmip6, fliplr(curve4_cmip6)];
-
-
-    % Fill in the area between the upper and lower likely percentiles
-    % Emulation
-    c = colmat(1,:);
-    f = fill(x2, inBetween_emul, c, 'edgecolor','none');
-    set(f,'facealpha',.3)
-    hold on
-
-    
-    % CMIP6
-    c = [0 0 0]+0.5;
-    f2 = fill(x2, inBetween_cmip6, c, 'edgecolor','none'); 
-    set(f2,'facealpha',.3)
-
-    
-    % Plot the mean:
-    d = colmat(1,:);
-    emul = plot(x, emul_mean, 'color', d, 'LineWidth', 3);     % Emulation
-
-    c = [0 0 0];
-    cmip6 = plot(x, cmip6_mean, 'color', c, 'LineWidth', 3);   % CMIP6                  
-
-
-    
-
-    % Title for each panel
-    if ismember(tt, [2])
-        ending = ["Absolute"];
-    else
-        ending = ["Anomaly"];
-    end
-    title([ending])
-
-    
-    % Plot labels
-    if tt == 1
-        ylabel('Emulated Arctic Annual Temperature (\circC)' ); 
-    end
-    xlabel('Year');
-
-
-    % Save plots for legend
-    if tt == 1
-        hnew_VL_range_emul = cat(1, hnew_VL_range_emul, f);
-        hnew_mean_emul = cat(1, hnew_mean_emul, emul);  
-
-        hnew_mean_cmip6 = cat(1, hnew_mean_cmip6, cmip6);
-        hnew_VL_range_cmip6 = cat(1, hnew_VL_range_cmip6, f2);       
-    end
-
-
-    % Set fontsize of plot labels
-    set(gca,'FontSize', 20)
-
-    grid
-
-    xline(2100, 'linewidth', 1.5)
-
-    h.Position(1) = h.Position(1) - 0.05; 
-    h.Position(4) = h.Position(4) - 0.2; 
-    h.Position(2) = h.Position(2) + 0.2; 
-
-    if tt == 2
-        h.Position(1) = h.Position(1) - 0.03; 
-    end
-
-    xlim([1850 2300])
-
-end
-
-% Legend data
-hnew_final = [hnew_VL_range_emul; hnew_VL_range_cmip6; hnew_mean_emul; hnew_mean_cmip6]; 
-
-% Legend labels
-legend_deeets = ["Emulated Likely Range", "CMIP6 Likely Range","Emulated Mean", "CMIP6 Mean"];
-
- % Create legend
-[tt2] = legend(hnew_final, legend_deeets, 'Location', 'eastoutside', 'fontsize', 16, 'NumColumns', 1);
-tt2.Box = 'off';
-
-% Move posistion of the legend
-newPosition = [0.89 0.36 0.05 0.05];
-newUnits = 'normalized';
-set(tt2,'Position', newPosition,'Units', newUnits);
-
-
-
-
-% set(gcf, 'PaperOrientation', 'landscape')
-% set(gcf,'PaperSize',[53 29.7000]);
-
-% % Save 
-% temp=['Fig3.3', '.pdf']; 
-% saveas(gca,temp); 
 
 
 
@@ -2001,107 +1779,117 @@ set(gcf,'PaperSize',[53 29.7000]);
 
 
 
-%% Plot against AMST: to assess how well our calibrations match the CMIP6 AMST vs SIA data to 2300 (Fig3.8, Chapter 3, Section 3.3.2.1)
+%% Plot against AMST: to assess how well our calibrations match the CMIP6 AMST vs SIA data to 2300 (Fig6, Section 3.1)
 
-amst_2100 = [tas_store{1}(model_ind(1:3)),  {NaN},  tas_store{1}(model_ind(5))];    % 2100 data
+tas_global_2300_anom_ruby_extracted = [tas_global_2300_anom_ruby(1:3), tas_global_2300_anom_ruby(5:6)];
+
+if size(calibrated_SIA_store_2300{3}, 1) < 451
+    calibrated_SIA_store_2300{3} = [calibrated_SIA_store_2300{3}; repelem(NaN, 12)];
+else
+    calibrated_SIA_store_2300{3} = calibrated_SIA_store_2300{3}(1:451,:);
+end
+
+if size(AMST_calibration_bias_corrected_2300_extraced{3}, 1) < 451
+    AMST_calibration_bias_corrected_2300_extraced{3} = [AMST_calibration_bias_corrected_2300_extraced{3}; repelem(NaN, 12)];
+else
+    AMST_calibration_bias_corrected_2300_extraced{3} = AMST_calibration_bias_corrected_2300_extraced{3}(1:451,:);
+end
+
 
 cols = jet(12);
 close all; clc
 figure(3)
 set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
 ind_months = [12, 3, 5];
-for j = 1:5        % Model Index
-    h = subplot(3,2,j);
+counter_made = -1;
+for j = 1:5
+    counter_made = counter_made + 2;
+    h = subplot(5,2,counter_made);
     cmip6_scat = [];
     emulation_scat = [];
-    for i = ind_months  %   Month index
-
-        % 2300 emulation
-        emulation_scat_hold = scatter( tas_amst_2300_extraced{j}(:,i), calibrated_SIA_store_2300{j}(:,i), 15, 'markerfacecolor', [0 0 0]+0.3, 'markeredgecolor', [0 0 0]+0.3 ); hold on
+    for i = ind_months
+        % Emulation
+        emulation_scat_hold = plot( AMST_calibration_bias_corrected_2300_extraced{j}(:,i), calibrated_SIA_store_2300{j}(:,i), 'color', cols(i,:), 'linewidth', 1.3 ); hold on
         emulation_scat = cat(1, emulation_scat, emulation_scat_hold);
 
         % CMIP6
-        cmip6_scat_hold = scatter( tas_amst_2300_extraced{j}(:,i), siarean_final{j}(:,i),  15, 'markerfacecolor', cols(i,:), 'markeredgecolor', cols(i,:) ); hold on
+        cmip6_scat_hold = scatter( tas_amst_2300_extraced{j}(:,i), siarean_final{j}(:,i),  5, 'markerfacecolor', cols(i,:), 'markeredgecolor', cols(i,:) ); hold on
         cmip6_scat = cat(1, cmip6_scat, cmip6_scat_hold);
-            
-        xline( tas_amst_2300_extraced{j}(251,i), 'color', cols(i,:), 'linewidth', 2 )
 
-        yline(8)
-        yline(10)
     end
-    title(SIA_2300_models(j))
     grid
     h.FontSize = 16;
+    title(SIA_2300_models(j), 'FontSize', 14)
     yline(1)
-    ylabel({'Arctic SIA'; '(million km^{2})'})
-    xlabel('Arctic Temperature (\circC)')
     xlim([-40 15])
+
+    h.Position(3) = h.Position(3) - 0.15;
+    h.Position(1) = h.Position(1) - 0.05;
+
+    if j == 1
+     h.Position(2) = h.Position(2) + 0.04;
+    elseif j == 2
+        h.Position(2) = h.Position(2) + 0.03;
+    elseif j == 3
+        h.Position(2) = h.Position(2) + 0.02;
+    elseif j == 4
+        h.Position(2) = h.Position(2) + 0.01;
+    elseif j == 5
+        h.Position(2) = h.Position(2) + 0.00;
+    end
 end
-legend_text = [month_label(ind_months); month_label(ind_months)];
-legend_text(1,:) = cellfun(@(v) [v, ': CMIP6'], legend_text(1,:), 'UniformOutput', false);
-legend_text(2,:) = cellfun(@(v) [v, ': Emulator'], legend_text(2,:), 'UniformOutput', false);
-legend_text = legend_text';
-legend_text = legend_text(:);
-
-legend_data = [cmip6_scat, emulation_scat];
-legend_data = legend_data(:);
-
-tt2 = legend(legend_data, legend_text, 'location', 'eastoutside', 'NumColumns', 2);
-tt2.Position(1) = tt2.Position(1)+0.4;
-tt2.FontSize = 16;
-legend boxoff
-
-
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[53 29.7000]); 
-
-% % Save
-% temp=['Fig3.8', '.pdf']; 
-% saveas(gca,temp); 
+y_pos = ylabel({'Arctic SIA (million km^{2})'})
+y_pos.Position(2) = y_pos.Position(2) + 55;
+xlabel('Arctic Temperature (\circC)')
 
 
 
 
 
-%% %% Plot against GMST: to assess how well our calibrations match the CMIP6 GMST vs SIA data to 2300 (Fig3.10, Chapter 3, Section 3.3.2.2)
-
-if size(tas_store_combined_2300_ruby{3}, 2) < 451
-    tas_store_combined_2300_ruby{3} = [tas_store_combined_2300_ruby{3}, NaN];
-else
-    tas_store_combined_2300_ruby{3} = tas_store_combined_2300_ruby{3}(1:451);
-end
-
-cols = jet(12);
-close all
-clc
-figure(3)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
+% GMST
 ind_months = [12, 5, 3];
+counter_made = 0;
 for j = 1:5
-    h = subplot(3,2,j);
+    counter_made = counter_made + 2;
+    h = subplot(5,2,counter_made);
     cmip6_scat = [];
     emulation_scat = [];
 
     for i = ind_months
 
         % Emulation to 2300 from 2300 GMST
-        emulation_scat_hold = plot( tas_global_2300_anom_ruby_extracted{j}, calibrated_SIA_store_2300{j}(:,i), 'color', cols(i,:), 'linewidth', 2 ); hold on
+        emulation_scat_hold = plot( tas_global_2300_anom_ruby_extracted{j}, calibrated_SIA_store_2300{j}(:,i), 'color', cols(i,:), 'linewidth', 1.3 ); hold on
         emulation_scat = cat(1, emulation_scat, emulation_scat_hold);
 
         % CMIP6
-        cmip6_scat_hold = scatter( tas_global_2300_anom_ruby_extracted{j}, siarean_final{j}(:,i),  15, 'markerfacecolor', cols(i,:), 'markeredgecolor', cols(i,:) ); hold on
+        cmip6_scat_hold = scatter( tas_global_2300_anom_ruby_extracted{j}, siarean_final{j}(:,i),  5, 'markerfacecolor', cols(i,:), 'markeredgecolor', cols(i,:) ); hold on
         cmip6_scat = cat(1, cmip6_scat, cmip6_scat_hold);
 
-        xline( tas_global_2300_anom_ruby_extracted{j}(251), 'color', cols(i,:), 'linewidth', 2 ) % Show where 2100 ends
     end
     xlim([-2 12])
-    title(SIA_2300_models(j))
     grid
     h.FontSize = 16;
+    title(SIA_2300_models(j), 'FontSize', 14)
     yline(1)
-    ylabel({'Arctic SIA'; '(million km^{2})'})
-    xlabel(' Global-Mean Temperature Anomaly ')
+    % ylabel({'Arctic SIA'; '(million km^{2})'})
+    % xlabel(' Global-Mean Temperature Anomaly ')
+
+    h.Position(3) = h.Position(3) - 0.15;
+    h.Position(1) = h.Position(1) - 0.25;
+
+    if j == 1
+     h.Position(2) = h.Position(2) + 0.04;
+    elseif j == 2
+        h.Position(2) = h.Position(2) + 0.03;
+    elseif j == 3
+        h.Position(2) = h.Position(2) + 0.02;
+    elseif j == 4
+        h.Position(2) = h.Position(2) + 0.01;
+    elseif j == 5
+        h.Position(2) = h.Position(2) + 0.00;
+    end
 end
+xlabel(' Global-Mean Temperature Anomaly ')
 
 legend_text = [month_label(ind_months); month_label(ind_months)];
 legend_text(1,:) = cellfun(@(v) [v, ': CMIP6'], legend_text(1,:), 'UniformOutput', false);
@@ -2112,265 +1900,26 @@ legend_text = legend_text(:);
 legend_data = [cmip6_scat, emulation_scat];
 legend_data = legend_data(:);
 
-tt2 = legend(legend_data, legend_text, 'location', 'eastoutside', 'NumColumns', 2);
-tt2.Position(1) = tt2.Position(1)+0.4;
+tt2 = legend(legend_data, legend_text, 'location', 'southoutside', 'NumColumns', 1);
+tt2.Position(1) = tt2.Position(1)+0.17;
+tt2.Position(2) = tt2.Position(2)+0.1;
 tt2.FontSize = 16;
 legend boxoff
 
 
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[53 29.7000]); 
+x = [0.29 0.29];
+y = [0.02 0.98];
+annotation('line', x, y, 'LineStyle', '--', 'Linewidth', 2)
 
-% % Save 
-% temp=['Fig3.10', '.pdf']; 
-% saveas(gca,temp);  
 
+set(gcf, 'PaperOrientation', 'portrait')
+set(gcf,'PaperSize',[45 27.7000]); 
 
 
 
 
 
-%% Affect of a larger AA on SIA: Fig3.11, Chapter 3, Section 3.3.2.3
 
-clc; close all
-figure(42)
-set(gcf, 'Units', 'Inches', 'Position', [.5 .5 20 11])
-j_hold = 3; j = j_hold;
-h = subplot(2,2,3); 
-
-temp_ind = 1.5;
-ind_tt = AMST_calibration_bias_corrected_2300_extraced{j}(1,i) - (AMST_calibration_bias_corrected_2300_extraced{j}(1,i).*temp_ind);
-test_amst_1 = (AMST_calibration_bias_corrected_2300_extraced{j}(1:451,:).*temp_ind) + ind_tt;
-
-i=3; plot(1850:2300, test_amst_1(:,i), 'color', [ 0 0 1 ] , 'linewidth', 2 ); hold on; plot( 1850:2300, AMST_calibration_bias_corrected_2300_extraced{j}(:,i) , 'r' , 'linewidth', 2 )
-grid
-ax = gca; ax.FontSize = 18;
-xlabel( 'Year' )
-ylabel('Arctic Temperature (\circC)')
-tt2 = legend('Test Case', 'Original AMST', 'CMIP6', 'location', 'northwest');
-tt2.Box = 'off';
-
-
-h = subplot(2,2,4);
-calibrated_SIA_withCMIP6tas_store_2 = [];
-calibrated_SIA_with_OG_tas_store_2 = [];
-for j = j_hold
-    
-    hnew3 = []; 
-    tt_store = 1:12;
-
-    
-%   SIA CMIP6
-    SIA_store = siarean_final{j}; 
-    
-
-%   Use parameterised SIA_max
-    SIA_max = SIA_max_param_1850_extraced_2300(j,1:12);
-
-    
-    % Calibrated parameters
-    a = new_vals_extracted(j,1);
-    sm_shift = new_vals_extracted(j,2);
-    w1_store = new_vals_extracted(j,3);
-    b = new_vals_extracted(j,4);
-            
-    
-
-    % ________ FORCING WITH TEST TAS _________ % 
-    x_tas = test_amst_1; 
-
-    calibrated_SIA_withCMIP6tas = ( ((SIA_max+sm_shift) .* (1 + exp((x_tas(1,:)-b)))) - (a.*(x_tas - x_tas(1,:))) ) ./ ( 1 + exp(x_tas-b) );
-    calibrated_SIA_withCMIP6tas_store_2{j} = calibrated_SIA_withCMIP6tas;
-
-
-
-    % ________ FORCING WITH OG TAS _________ % 
-    x_tas = AMST_calibration_bias_corrected_2300_extraced{j};
-
-    calibrated_SIA_withCMIP6tas = ( ((SIA_max+sm_shift) .* (1 + exp((x_tas(1,:)-b)))) - (a.*(x_tas - x_tas(1,:))) ) ./ ( 1 + exp(x_tas-b) );
-    calibrated_SIA_with_OG_tas_store_2{j} = calibrated_SIA_withCMIP6tas;
-
-
-        
-    % TEST CALIBRATIONS
-    ind = [3];
-    for i = ind
-
-        scatter( AMST_calibration_bias_corrected_2300_extraced{j}(:,i), calibrated_SIA_withCMIP6tas_store_2{j}(1:451,i), 20, 'markerfacecolor', [ 0 0 1 ], 'markeredgecolor', [ 0 0 1 ] ); hold on % FORCED WITH TEST
-        % scatter( test_amst_2(:,i), calibrated_SIA_withCMIP6tas_store_2{j}(1:451,i), 20, 'markerfacecolor', [ 0 0 1 ], 'markeredgecolor', [ 0 0 1 ] ); hold on % FORCED WITH TEST
-
-        cmip6_sens_hold = scatter( AMST_calibration_bias_corrected_2300_extraced{j}(:,i), movmean(calibrated_SIA_with_OG_tas_store_2{j}(:,i), 1), 20, 'markerfacecolor', [ 1 0 0 ], 'markeredgecolor', [ 1 0 0 ] ); hold on  % OG EMULATION
-
-    end
-    grid
-    tt2 = legend( 'SIA forced with test case', 'SIA forced with original AMST emulation', 'SIA forced with CMIP6 AMST', 'CMIP6', 'location', 'northeast');
-    tt2.Box = 'off';
-    ax = gca; ax.FontSize = 18;
-    xlabel('Arctic Temperature (\circC)')
-    ylabel( 'Arctic SIA (million km^{2})' )
-    ylim([0 23])
-
-end
-
-
-
-
-
-
-
-% TOP PANEL
-h = subplot(2,2,1);
-temp_ind = 1.5;
-ind_tt = AMST_calibration_bias_corrected_2300_extraced{j}(251,i) - (AMST_calibration_bias_corrected_2300_extraced{j}(251,i).*temp_ind);
-test_amst_2 = [AMST_calibration_bias_corrected_2300_extraced{j}(1:251,:); (AMST_calibration_bias_corrected_2300_extraced{j}(252:451,:).*temp_ind)+ind_tt]; 
-i=3; plot(1850:2300, test_amst_2(:,i), 'color', [0 0 1] , 'linewidth', 2 ); hold on; plot( 1850:2300, AMST_calibration_bias_corrected_2300_extraced{j}(:,i) , 'r' , 'linewidth', 2 )
-plot( 1850:2300,tas_amst_2300_extraced{j}(:,i) , 'k' , 'linewidth', 2 )
-grid
-ax = gca; ax.FontSize = 18;
-xlabel( 'Year' )
-ylabel('Arctic Temperature (\circC)')
-tt2 = legend('Test Case', 'Original AMST', 'CMIP6', 'location', 'northwest');
-tt2.Box = 'off';
-
-
-
-h = subplot(2,2,2);
-
-calibrated_SIA_withCMIP6tas_store_2 = [];
-calibrated_SIA_with_OG_tas_store_2 = [];
-calibrated_SIA_withCMIP6tas_store_3 = [];
-for j = j_hold
-    
-    hnew3 = []; 
-    tt_store = 1:12;
-
-    
-%   SIA CMIP6
-    SIA_store = siarean_final{j}; 
-    
-
-%   Use parameterised SIA_max
-    SIA_max = SIA_max_param_1850_extraced_2300(j,1:12);
-
-    
-    % Calibrated parameters
-    a = new_vals_extracted(j,1);
-    sm_shift = new_vals_extracted(j,2);
-    w1_store = new_vals_extracted(j,3);
-    b = new_vals_extracted(j,4);
-            
-    
-
-    % ________ FORCING WITH TEST TAS _________ % 
-    x_tas = test_amst_2;
-
-    calibrated_SIA_withCMIP6tas = ( ((SIA_max+sm_shift) .* (1 + exp((x_tas(1,:)-b)))) - (a.*(x_tas - x_tas(1,:))) ) ./ ( 1 + exp(x_tas-b) );
-    calibrated_SIA_withCMIP6tas_store_2{j} = calibrated_SIA_withCMIP6tas;
-
-
-
-    % ________ FORCING WITH CMIP6 TAS _________ % 
-    x_tas = tas_amst_2300_extraced{j};
-
-    calibrated_SIA_withCMIP6tas = ( ((SIA_max+sm_shift) .* (1 + exp((x_tas(1,:)-b)))) - (a.*(x_tas - x_tas(1,:))) ) ./ ( 1 + exp(x_tas-b) );
-    calibrated_SIA_withCMIP6tas_store_3{j} = calibrated_SIA_withCMIP6tas;
-
-
-
-
-    % ________ FORCING WITH OG TAS _________ % 
-    x_tas_store = AMST_calibration_bias_corrected_2300_extraced{j};
-    x_tas = AMST_calibration_bias_corrected_2300_extraced{j};
-
-    calibrated_SIA_withCMIP6tas = ( ((SIA_max+sm_shift) .* (1 + exp((x_tas(1,:)-b)))) - (a.*(x_tas - x_tas(1,:))) ) ./ ( 1 + exp(x_tas-b) );
-    calibrated_SIA_with_OG_tas_store_2{j} = calibrated_SIA_withCMIP6tas;
-
-
-        
-    % TEST CALIBRATIONS
-    ind = [3];
-    for i = ind
-
-        scatter( AMST_calibration_bias_corrected_2300_extraced{j}(:,i), calibrated_SIA_withCMIP6tas_store_2{j}(1:451,i), 20, 'markerfacecolor', [ 0 0 1 ], 'markeredgecolor', [ 0 0 1 ] ); hold on % FORCED WITH TEST
-        % scatter( test_amst_2(:,i), calibrated_SIA_withCMIP6tas_store_2{j}(1:451,i), 20, 'markerfacecolor', [ 0 0 1 ], 'markeredgecolor', [ 0 0 1 ] ); hold on % FORCED WITH TEST
-
-        scatter( AMST_calibration_bias_corrected_2300_extraced{j}(:,i), movmean(calibrated_SIA_with_OG_tas_store_2{j}(:,i), 1), 20, 'markerfacecolor', [ 1 0 0 ], 'markeredgecolor', [ 1 0 0 ] ); hold on  % OG EMULATION
-
-        scatter( AMST_calibration_bias_corrected_2300_extraced{j}(:,i), calibrated_SIA_withCMIP6tas_store_3{j}(1:451,i), 20, 'markerfacecolor', colorblind(10,:), 'markeredgecolor', colorblind(10,:) ); hold on % FORCED WITH CMIP6
-
-        scatter( tas_amst_2300_extraced{j}(:,i), movmean(siarean_final{j}(:,i), 1), 20, 'markerfacecolor', [ 0 0 0 ], 'markeredgecolor', [ 0 0 0 ] ); hold on  % CMIP6
-
-    end
-    grid
-    tt2 = legend( 'SIA forced with test case', 'SIA forced with original AMST emulation', 'SIA forced with CMIP6 AMST', 'CMIP6', 'location', 'northeast');
-    tt2.Box = 'off';
-    ax = gca; ax.FontSize = 18;
-    xlabel('Arctic Temperature (\circC)')
-    ylabel( 'Arctic SIA (million km^{2})' )
-    ylim([0 23])
-
-end
-
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[53 29.7000]); 
-
-% % Save Normalised
-% temp=['SuppFig3.11', '.pdf']; 
-% saveas(gca,temp);  
-
-
-
-
-
-
-%% Plot AMST May, November and December to 2100: FigB.2, Chapter 3, Supplementary
-
-cols = jet(12);
-close all; clc
-figure(3)
-set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-ind_months = [11, 12, 5];
-for j = 1:12
-    h = subplot(3,4,j);
-    cmip6_scat = [];
-    for i = ind_months
-
-        % CMIP6 to 2100
-        cmip6_scat_hold = scatter( tas_store{1}{j}(:,i), updated_hist_sia_annual_curve_all_models{j,1}(:,i), 15, 'markerfacecolor', cols(i,:), 'markeredgecolor', cols(i,:) ); hold on
-        cmip6_scat = cat(1, cmip6_scat, cmip6_scat_hold);
-     
-    end
-    title(models_alone(j))
-    h.FontSize = 16;
-    yline(1, 'linewidth', 2 )
-    if ismember(j, [1,5,9])
-        ylabel({'Arctic SIA (million km^{2})'})
-    end
-    if ismember(j, [9:12])
-        xlabel({'Arctic Temperature (\circC)'})
-    end
-    if ismember(j, [1:6,8:12])
-        xlim([-32 5])
-    else
-        xlim([-40 5])
-    end
-
-    h.Position(1) = h.Position(1) - 0.03;
-
-    grid
-end
-tt2 = legend(cmip6_scat, month_label(ind_months), 'location', 'eastoutside', 'NumColumns', 1);
-tt2.Position(1) = tt2.Position(1)+0.08;
-tt2.Position(2) = tt2.Position(2)-0.05;
-tt2.FontSize = 16;
-legend boxoff
-
-set(gcf, 'PaperOrientation', 'landscape')
-set(gcf,'PaperSize',[53 29.7000]);
-
-% % Save Normalised
-% temp=['FigB.2', '.pdf']; 
-% saveas(gca,temp); 
 
 
 
