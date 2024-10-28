@@ -1,4 +1,4 @@
-%% Carbon Budget Calculations: Thesis Chapter 5
+%% Carbon Budget Calculations: Section 3.3
 
 %% ____ Loading RCMIP cumulative CO2 data ____ %% 
 % Extract MAGICC Ensemble Members for Emulation
@@ -142,10 +142,10 @@ legend(legend_labels, 'location', 'northwest')
 
 
 %% _____________ Linear mode months remaining carbon budget calculations _____________ %% 
-% Chapter 5, Section 5.3.1
+%  Section 3.4
 
 
-% PLOT Septemeber sea ice as a function of CO2: Fig 5.2, Chapter 5, Section 5.3.1
+% Septemeber sea ice as a function of CO2:
 % Initialisation 
 threshold = [5, 95];
 percentiles_0 = [];
@@ -1628,276 +1628,226 @@ med = median( CB_at_b_2023(:,3), 'omitnan' );
 
 
 
+%% ____ Fig 8 ____ %% 
 
-
-
-
-
-%% Add boxplots
-
-% _________BOX 1 _________ % 
-% Sensitivities 
-axes('Position',[.53 .427 .16 .505])
-box on
-
-% Plot OC emulator sensitivity after sensitivity increases
-hold on
-sens_79_14 = boxplot(sens_march_acc(:,3), 'positions', 1.6+0.34, 'color', colorss1(1,:), 'plotstyle', 'compact');
-a = get(get(gca,'children'),'children');   % Get the handles of all the objects
-t = get(a,'tag');   % List the names of all the objects 
-idx=strcmpi(t,'box');  % Find Box objects
-boxes=a(idx);          % Get the children you need
-set(boxes,'linewidth',10); % Set widths
-hAx = gca;
-lines = hAx.Children;
-lines = lines(1);
-bp_cmip6 = findobj(lines, 'tag', 'Box');
-bp_cmip6.YData(1,1) = quantile(sens_march_acc(:,3), 0.75);
-bp_cmip6.YData(1,2) = quantile(sens_march_acc(:,3), 0.25);
-set(sens_79_14(length(sens_79_14),:),'Visible','off')     % Remove the outliers
-Median_dot_lines = findobj(sens_79_14, 'type', 'line', 'Tag', 'MedianInner');     % Make median bigger and bolder
-set(Median_dot_lines, 'MarkerFaceColor', 'k');
-set(Median_dot_lines, 'Color', 'k');
-set(Median_dot_lines, 'MarkerSize', 14);
-Median_dot_lines = findobj(sens_79_14, 'type', 'line', 'Tag', 'MedianOuter');
-Median_dot_lines(1).Visible = 'off';
-
-
-
-
-
-% Plot OC emulator between 1979-2014
-hold on
-sens_79_14_m2_ton = ( magicc_sens_march_79_14{1} * 1e12 ) / 1e9;
-sens_79_14 = boxplot(sens_79_14_m2_ton, 'positions', 1.6, 'color', colorss1(1,:), 'plotstyle', 'compact');
-a = get(get(gca,'children'),'children');   % Get the handles of all the objects
-a = a{1};
-t = get(a,'tag');   % List the names of all the objects 
-idx=strcmpi(t,'box');  % Find Box objects
-boxes=a(idx);          % Get the children you need
-set(boxes,'linewidth',10); % Set widths
-set(sens_79_14(length(sens_79_14),:),'Visible','off')     % Remove the outliers
-Median_dot_lines = findobj(sens_79_14, 'type', 'line', 'Tag', 'MedianInner');     % Make median bigger and bolder
-set(Median_dot_lines, 'MarkerFaceColor', 'k');
-set(Median_dot_lines, 'Color', 'k');
-set(Median_dot_lines, 'MarkerSize', 14);
-Median_dot_lines = findobj(sens_79_14, 'type', 'line', 'Tag', 'MedianOuter');
-Median_dot_lines(1).Visible = 'off';
-
-
-
-% Plot observations 1979-2014
-hold on
-sens_79_14 = boxplot(sensitivities_co2_obs_march, 'positions', 0.9, 'color', [0 0 0]+0.5, 'plotstyle', 'compact');
-a = get(get(gca,'children'),'children');   % Get the handles of all the objects
-a = a{1};
-t = get(a,'tag');   % List the names of all the objects 
-idx=strcmpi(t,'box');  % Find Box objects
-boxes=a(idx);          % Get the children you need
-set(boxes,'linewidth',10); % Set width
-hAx = gca;
-lines = hAx.Children;
-lines = lines(1);
-bp_cmip6 = findobj(lines, 'tag', 'Box');
-bp_cmip6.YData(1,1) = quantile(sensitivities_co2_obs_march, 1.0);
-bp_cmip6.YData(1,2) = quantile(sensitivities_co2_obs_march, 0.0);
-Median_dot_lines = findobj(sens_79_14, 'type', 'line', 'Tag', 'MedianInner');     % Make median bigger and bolder
-set(Median_dot_lines, 'MarkerFaceColor', 'k');
-set(Median_dot_lines, 'Color', 'k');
-set(Median_dot_lines, 'MarkerSize', 14);
-Median_dot_lines = findobj(sens_79_14, 'type', 'line', 'Tag', 'MedianOuter');
-Median_dot_lines(1).Visible = 'off';
-
-
-
-
-% Plot observations over linear period
 clc
-CMIP6_sens_1850_2100 = [];
-CB_CMIP6_linear = [];
-for j = 1:12
-    for n = 1
-        cum_co2_one = cumsum_co2_emissions_int{1}(101:351);
-        SIA = updated_hist_sia_annual_curve_all_models{j,n}(:,3);
-        
-        y = SIA;
-        x = cum_co2_one;
-        pi_SIA = mean(SIA(1:51));
-        
-        x(y > pi_SIA-(pi_SIA.*0.1)) = [];
-        y(y > pi_SIA-(pi_SIA.*0.1)) = [];
-
-
-        CMIP6_sens_1850_2100_hold = polyfit(x, y, 1);
-        CMIP6_sens_1850_2100{j,n} = (CMIP6_sens_1850_2100_hold(1) * 1e12) / 1e9;
-
-        xFit = linspace(min(x), max(x), 1000);
-        yFit = polyval(CMIP6_sens_1850_2100_hold , xFit);
-        CB_CMIP6_linear{j,n} = interp1( yFit , xFit, 1, 'linear', 'extrap');
-    end
-end
-CMIP6_sens_1850_2100 = cell2mat(CMIP6_sens_1850_2100);
-CB_CMIP6_linear = cell2mat(CB_CMIP6_linear); 
-
-
-cmip6_CB = boxplot(CMIP6_sens_1850_2100(:), 'positions', 1.25, 'color', [1 0 0], 'plotstyle', 'compact'); 
-set(cmip6_CB(length(cmip6_CB),:),'Visible','off')         % Remove the outliers
-a = get(get(gca,'children'),'children');   % Get the handles of all the objects
-a = a{1};
-t = get(a,'tag');   % List the names of all the objects 
-idx=strcmpi(t,'box');  % Find Box objects
-boxes=a(idx);          % Get the children you need
-set(boxes,'linewidth',10); % Set width
-Median_dot_lines = findobj(cmip6_CB, 'type', 'line', 'Tag', 'MedianInner');     % Make median bigger and bolder
-set(Median_dot_lines, 'MarkerFaceColor', 'k');
-set(Median_dot_lines, 'Color', 'k');
-set(Median_dot_lines, 'MarkerSize', 14);
-Median_dot_lines = findobj(cmip6_CB, 'type', 'line', 'Tag', 'MedianOuter');
-Median_dot_lines(1).Visible = 'off';
-grid 
-
-% Plot Edits
-set(gca, 'xtick', [0.9, 1.25, 1.6, 1.6+0.34 ], 'XTickLabels', compose([ "Observations", "CMIP6", "This Study: 1979-2014", "This Study: after abrupt ice loss" ]), 'fontsize', 16)
-xtickangle(45)
-title([{ ' March Sensitivity ' ; ' (dSIA/dC02) ' }], 'fontsize', 14, 'interpreter', 'none')
-ylabel(' m^2/ t')
-xlim([0.5 2.3])
-ylim([-4.0 0])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% Fig 5.5 Chapter 5, Section 5.3.2: the seasonal CB over linear and non-linear months
-
 close all
 figure(3)
 set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
-clc
-axes('Position',[.3 .08 .45 .35])
+colorss1 = [1 0.8 0.8; 0.8 0.8 1; 0 0.6906 0.5];
+
+
+yticks_hold = [];
+yticks_hold_2 = [];
+
+
+h = tiledlayout(1,1);
+ax1 = axes(h);
+ind_month = [7:12, 1:6];
+for i = ind_month
+
+     xlabel(' Cumulative CO_2 emissions since 1850 (GtCO_2)  ')
+   
+    ax1.XAxisLocation = 'top';
+
+end
+
+ax2 = axes(h);
+for i = ind_month
 
 
 
-% __________ Linear mode ___________ %
-index_months = [7:12];
-for i = index_months
-            
-    % Boxplot of carbon budget in each month
-    CBR = boxplot(cb_1_ensembles_final_months_2023{i}, 'positions', i, 'color', colorss1(1,:), 'plotstyle', 'compact'); hold on
-    set(CBR(length(CBR),:),'Visible','off')     % Remove the outliers
+    % ____ Emulator: CB 2023 ____ %
+    CB23 = boxplot(ax2, CB_2024_PUB{i}, 'positions', i+0.15, 'color', colorss1(1,:), 'plotstyle', 'compact', 'orientation', 'horizontal'); hold on
+    set(CB23(length(CB23),:),'Visible','off')         % Remove the outliers
 
     hAx = gca;
     lines = hAx.Children;
     lines = lines(1);
     bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile(cb_1_ensembles_final_months_2023{i}, 0.25);
-    bp_cmip6.YData(1,2) = quantile(cb_1_ensembles_final_months_2023{i}, 0.75);
+    bp_cmip6.XData(1,1) = quantile(CB_2024_PUB{i}, 0.25);
+    bp_cmip6.XData(1,2) = quantile(CB_2024_PUB{i}, 0.75);
 
-    Median_dot_lines = findobj(CBR, 'type', 'line', 'Tag', 'MedianInner');     % Make median bigger and bolder
-    set(Median_dot_lines, 'MarkerFaceColor', 'k');
-    set(Median_dot_lines, 'Color', 'k');
-    set(Median_dot_lines, 'MarkerSize', 14);
+
+    if ismember(i, [7:12])
+        % ____ CMIP6: CB 2023 ____ %
+        cmip6_CB = boxplot(ax2, CB_store_cmip6_2023{i}, 'positions', i-0.15, 'color', [1 0 0], 'plotstyle', 'compact', 'orientation', 'horizontal'); 
+        set(cmip6_CB(length(cmip6_CB),:),'Visible','off')         % Remove the outliers
     
-    Median_dot_lines = findobj(CBR, 'type', 'line', 'Tag', 'MedianOuter');
-    Median_dot_lines(1).Visible = 'off';
-
-
-end
-hold on
-
-
-
-% ___________ Non-linear mode ___________ % 
-index_months = [1:6];  
-for i = index_months
-            
-    % Boxplot of carbon budget in each month
-    CBR = boxplot( CB_at_b_2023(:,i), 'positions', i, 'color', colorss1(1,:), 'plotstyle', 'compact'); hold on
-    set(CBR(length(CBR),:),'Visible','off')     % Remove the outliers
-
-    hAx = gca;
-    lines = hAx.Children;
-    lines = lines(1);
-    bp_cmip6 = findobj(lines, 'tag', 'Box');
-    bp_cmip6.YData(1,1) = quantile( CB_at_b_2023(:,i), 0.25);
-    bp_cmip6.YData(1,2) = quantile( CB_at_b_2023(:,i), 0.75);
-
-
-    Median_dot_lines = findobj(CBR, 'type', 'line', 'Tag', 'MedianInner');     % Make median bigger and bolder
-    set(Median_dot_lines, 'MarkerFaceColor', 'k');
-    set(Median_dot_lines, 'Color', 'k');
-    set(Median_dot_lines, 'MarkerSize', 14);
+        hAx = gca;
+        lines = hAx.Children;
+        lines = lines(1);
+        bp_cmip6 = findobj(lines, 'tag', 'Box');
+        bp_cmip6.XData(1,1) = quantile(CB_store_cmip6_2023{i}, 0.25);
+        bp_cmip6.XData(1,2) = quantile(CB_store_cmip6_2023{i}, 0.75);
     
-    Median_dot_lines = findobj(CBR, 'type', 'line', 'Tag', 'MedianOuter');
-    Median_dot_lines(1).Visible = 'off';
+    end
+    
+    
+    a = get(get(gca,'children'),'children');   % Get the handles of all the objects
+    for ii = 1:length(a)
+        anew = a{ii};
+        t = get(anew,'tag');   % List the names of all the objects 
+        idx=strcmpi(t,'box');  % Find Box objects
+        boxes=anew(idx);          % Get the children you need
+        set(boxes,'linewidth',10); % Set width
+    end
+    
+    
+    
+    hold on
+    
+    yline((i-0.15) - 0.2750, 'color', [0 0 0]+0.7, 'linewidth', 1.5)
 
+
+    set(ax2, 'Position', get(ax1, 'Position'), 'Color', 'none');
+    ax2.XAxisLocation = 'bottom';   
+    ax2.YAxisLocation = 'right';
+
+
+
+
+    ax1.XLim = [1990, 16410];
+    ax2.XLim = [-500, 14000];
+
+
+    xlabpos = xlabel(' Remaining carbon budget (cumulative CO_2 emissions from 2024) (GtCO_2)  ');
+    
+    yticks_hold = cat(2, yticks_hold, [i-0.15, i+0.15]);
+    yticks_hold_2 = cat(2, yticks_hold_2, [i+0.0750]);
+
+    grid
 end
 
-% Change width of boxplots
-a = get(get(gca,'children'),'children');   % Get the handles of all the objects
-for ii = 1:length(a)
-    t = get(a{ii},'tag');   % List the names of all the objects 
-    idx=strcmpi(t,'box');  % Find Box objects
-    a_hold = a{ii};
-    boxes=a_hold(idx);          % Get the children you need
-    set(boxes,'linewidth',10); % Set width
-end
 
-% Add titles to distinguish which are the linear and non-linear mode months
-titl_summer = text(9.6, 15500, { ' Carbon Budget:';' to Prevent an Ice-free Summer Ocean '}, 'fontsize', 16, 'FontWeight', 'Bold', 'HorizontalAlignment', 'center');
-titl_winter = text(3.3, 15500, { ' Carbon Budget:';' of Abrupt Winter Ice-loss '}, 'fontsize', 16, 'FontWeight', 'Bold', 'HorizontalAlignment', 'center'); 
+set(gca, 'YDir', 'reverse');
 
-
-% Plot Edits
-ax = gca;
-ax.YAxis.Exponent = 0;
-ylabel(' Cumulative CO_2 (Gt CO_2)  ')
-set(gca, 'xtick', [1:12], 'XTickLabels', compose([string(month_label([1:12]))]), 'fontsize', 14)
-xtickangle(30)
-xlim([0 13])
-ylim([-500 14000])
-grid
-yline(0, 'color', [0 0 0], 'linewidth', 1)
-set(gca,'FontSize', 14)
-
-
-% Add shaded area below 0GtCO2 to show limit of carbon budget
-hold on
-x = 0:13;
-x2 = [x, fliplr(x)];
-curve1 = repelem(0, length(x));
-curve2 = repelem(-600, length(x));
+% Carbon Budget Shaded Area below 0 Gt CO2
+ind_ipcc = -800;
+x = ind_ipcc:0;
+x2 = [x, fliplr(x)]; 
+curve1 = repelem(15, length(x));
+curve2 = repelem(-2, length(x));
 inBetween = [curve1, fliplr(curve2)];
 c = [0 0 0]+0.7;
 f2 = fill(x2, inBetween, c, 'edgecolor','none'); 
 set(f2,'facealpha',.3)
-xline(6.5, '--') %  divides linear and non-linear mode months in two
-text( 0.1, 400, 'Non-linear Mode', 'color', [0 0 0]+0.5, 'FontSize', 14 )
-text( 11.2, 400, 'Linear Mode', 'color', [0 0 0]+0.5, 'FontSize', 14 )
-
-% % Save
-% set(gcf, 'PaperOrientation', 'landscape')
-% set(gcf,'PaperSize',[53 29.7000]);
-
-% % Save
-% temp=['Fig5.5', '.pdf']; 
-% saveas(gca,temp);
+xline(0, 'color', [0 0 0], 'linewidth', 1.5)
 
 
+set(ax1, 'fontsize', 14)
+set(ax2, 'fontsize', 14)
 
+ax2.YLim = [0.55 12.5];
+ax1.YLim = [0.55 12.5]; 
+
+
+set(ax1, 'ytick', [])
+
+
+h.Position = [0.23 0.3 0.45 0.6];
+
+
+set(ax2, 'ytick', [yticks_hold_2(7:12), yticks_hold_2(1:6)], 'YTickLabels', compose(string(month_label)), 'fontsize', 14)
+
+grid
+clc
+
+
+% xline(3000)
+
+
+
+% ___ IPCC CB ___ % 
+axes('Position',[.2414 .16 .1128 .1])
+
+% IPCC 1.5 degrees warming
+hold on
+correction_2020_2023 = 38*3;                % IPCC (from 1st Jan 2020) % they have been corrected for 2023 by assuming 38GtCO2/yr is lost (38*3)
+IPCC_CB = boxplot(([80, 496]), 'positions', 1.0, 'color', [0 0 0]+0.5, 'plotstyle', 'compact', 'orientation', 'horizontal');
+
+a = get(get(gca,'children'),'children');   % Get the handles of all the objects
+t = get(a,'tag');   % List the names of all the objects 
+idx=strcmpi(t,'box');  % Find Box objects
+boxes=a(idx);          % Get the children you need
+set(boxes,'linewidth',10); % Set width
+
+Median_dot_lines = findobj(IPCC_CB, 'type', 'line', 'Tag', 'MedianOuter');     % Make median bigger and bolder
+Median_dot_lines.XData = 275;
+
+Median_dot_lines = findobj(IPCC_CB, 'type', 'line', 'Tag', 'MedianInner');
+Median_dot_lines.XData = 275;
+
+
+% IPCC 2 degrees warming
+IPCC_CB_2 = boxplot(([900, 2300]-correction_2020_2023), 'positions', 1.2, 'color', [0 0 0]+0.5, 'plotstyle', 'compact', 'orientation', 'horizontal');
+
+a = get(get(gca,'children'),'children');   % Get the handles of all the objects
+a = a{1};
+t = get(a,'tag');   % List the names of all the objects 
+idx=strcmpi(t,'box');  % Find Box objects
+boxes=a(idx);          % Get the children you need
+set(boxes,'linewidth',10); % Set width
+
+Median_dot_lines = findobj(IPCC_CB_2, 'type', 'line', 'Tag', 'MedianInner');
+Median_dot_lines.XData = 1150; 
+Median_dot_lines = findobj(IPCC_CB_2, 'type', 'line', 'Tag', 'MedianOuter');
+Median_dot_lines.XData = 1150;
+
+
+ind = ['2', char(176), 'C'];
+ind_2 = ['1.5', char(176), 'C'];
+
+set(gca, 'ytick', [1, 1.2],'YTickLabels', compose([string(ind_2), string(ind)]), 'fontsize', 14)
+
+
+% Carbon Budget Shaded Area below 0 Gt CO2
+x = ind_ipcc:0;
+x2 = [x, fliplr(x)]; 
+curve1 = repelem(15, length(x));
+curve2 = repelem(-2, length(x));
+inBetween = [curve1, fliplr(curve2)];
+c = [0 0 0]+0.7;
+f2 = fill(x2, inBetween, c, 'edgecolor','none'); 
+set(f2,'facealpha',.3)
+xline(0, 'color', [0 0 0], 'linewidth', 1.5)
+
+
+clear ax
+ax = gca;
+ax.XLim = [-500, 3000];
+ax.YLim = [0.9 1.3];
+set(ax, 'fontsize', 14)
+set(ax, 'YAxisLocation', 'right');
+grid
+
+xline(median(CB_2024_PUB{9}, 'omitnan'), '--')
+
+
+y = [repelem(0.5975, 2)];
+x = [0.16 0.75];
+annotation('line', x, y, 'LineStyle', '--', 'Linewidth', 2)
+
+text( -1000, 1.86, 'Linear Mode', 'color', [0 0 0]+0.5, 'Rotation', 90, 'FontSize', 14 )
+text( -1000, 3.15, 'Non-linear Mode',  'color', [0 0 0]+0.5, 'Rotation', 90, 'FontSize', 14 )
+
+xlabpos.Position(2) = xlabpos.Position(2) + 3;
+
+
+% Add legend
+legend_labels = ["This Study", "CMIP6", "Paris Agreement Warming Targets"];
+tt2 = legend( [ CB23(2), cmip6_CB(2), IPCC_CB(2)], legend_labels, 'location', 'southeast', 'fontsize', 15);
+tt2.Box = 'off';
+tt2.Position(2) = tt2.Position(2) - 0.2;
+
+
+% Save
+set(gcf, 'PaperOrientation', 'landscape')
+set(gcf,'PaperSize',[53 29.7000]);
+
+% % Save Normalised
+% temp=['CB_pub_plot', '.pdf']; 
+% saveas(gca,temp); 
 
 
 
