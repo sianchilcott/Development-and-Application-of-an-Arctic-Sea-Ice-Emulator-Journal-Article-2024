@@ -2,31 +2,39 @@
 
 SETUP INSTRUCTIONS FOR ZENODO AND GITHUB REPOSITORIES (https://doi.org/10.5281/zenodo.14020702):
 
-The following provides an introduction and guide to the Zenodo and github repositories, for the pre-print manuscriupt presenting an Arctic Sea Ice Emulator. 
+The following provides an introduction and guide to the Zenodo and github repositories, for the pre-print manuscriupt presenting an Arctic Sea Ice Emulator parameterisation framework. The following scripts were run using the progammng interface MATLAB, version 2024, with no additional add-ons.
 
-[1] CMIP6 SIA data between 1850 and 2100, alongside MAGICC global mean
+This code is intended to showcase a parameterisation framework that compliments the in-text parameterisations and analysis provided, rather than a runnable tool. We intend for this setup to be a framework that can be reimplemented from the in-text parameterisations, provided and the functions and analysis provided in this repository. The scripts we provide here are therefore intended to be a reference that can be used to further understand the intext described process, it is not intended to be a ‘single click’ runnable tool. 
 
-[2]All files ending in ‘parameterisation.m’, are the parameterisations that make up the emulator and are referred to in the manuscript. These scripts must be run first, in any order. 
+Data: The scripts in this repository is setup to run using only the datasets described in the adjoining paper. This version does not support flexible data types. It can only be run using the CMIP6 models outlined in the paper over the 1850-2100 time period, alongside the observational datasets referenced, the MAGICC global-mean surface temperature ensemble and the RCMIP CO2 emission datasets. 
 
-[3] The following scripts must be run in the following order:
+The framework requires each script to be run separately in a specific order (defined in [1], [2] and [3]), using the data described under the ‘Data’ section above. Our setup does not currently support other datasets than those described in Section 2 of the adjoining paper, however the setup does allow other CMIP6 models than those currently used to run the setup. The following paragraph indicates the order in which each script can be run to reimplement the method in the paper:
+
+[1] All files ending in ‘parameterisation.m’, are the parameterisations that make up the emulator and are referred to in the manuscript. These scripts must be run first, in any order.
+- CMIP6_Arctic_Amplification_Parameterisation.m (Section 2.3)
+- AMST_parameterisation.m (Section 2.4)
+- SIA_max_Parameterisation.m (Section 2.5.1)
+- SIA_CMIP6_Parameterisation.m (Section 2.5.1)
+
+[2] To calibrate the above parameterisations with the CMIP6 data, the following scripts must be run in the following order:
 - Arctic_Seasonal_Temperature_Calibration.m
 - Arctic_Seasonal_Temperature_Calibration.m
 - SIA_max_Calibration.m
 - SIA_Calibration.m
 
-These scripts firstly calibrate the parameterisations to CMIP6 data, the calibration parameters are then used in the following scripts to constrain the CMIP6 calibrations to observations:
-- Arctic_Amplification_Observational_Constraint.m
-- Observationally_Constrained_Emulator_bias_corrections.m
+[3] The calibration parameters generated from running the scripts in [2] are then used in the following scripts to constrain the CMIP6 calibrations to observations:
+- Arctic_Amplification_Observational_Constraint.m (Section 2.3.1)
+- Observationally_Constrained_Emulator_bias_corrections.m (Section 2.4.1 and Section 2.5.2)
 
-[4] To apply the emulator to questions in the sea ice discourse e.g calulating both the probability of an ice-free Arctic Ocean and the remaining carbon budget to prevent seasonally ice-free conditions use:
-- Probability_Calculations.m
-- Carbon_Budget_Calculations.m
+[5] We evaluated our model performance to understand if the parameterisations provided could project the non-linearity of Arctic sea ice loss outside of the calibration period using the following scripts:
+- Assessing_calibrations_to_2300.m (Section 3.1)
 
-[5] To test the calibration parameters in extended runs use:
-- Assessing_calibrations_to_2300.m
+[4] We applied the emulator's parameterisation framework to questions in the sea ice discourse to further understand future sea ice loss (calulating both the probability of an ice-free Arctic Ocean and the remaining carbon budget to prevent seasonally ice-free conditions) using the following scripts:
+- Probability_Calculations.m (Section 3.3)
+- Carbon_Budget_Calculations.m (Section 3.3)
 
-[5] Appendix.m: This file mainly generates the figures and tables in the appendix.
+[6] Appendix.m: This file mainly generates the figures and tables in the supplementary material.
 
-You can then run the both the CMIP6 portion of the emulator, and the observationally constrained emulator.
+You can then run the both the CMIP6 parameterisation framwork of the emulator, and the observationally constrained framework.
 
 =================================================================================
