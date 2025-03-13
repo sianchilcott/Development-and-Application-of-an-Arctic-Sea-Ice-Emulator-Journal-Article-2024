@@ -1,6 +1,8 @@
 %% Stage iii: SIA Parameterisation
 % SIA_max Calibration (Section 2.5.1)
 
+% This script calibrates the function provided in SIA_max_Calibration.m to the CMIP6 models provided in Table S1.
+
 
 SIA_max_param_1850 = [];
 SIA_max_param_1850_test = [];
