@@ -1,4 +1,6 @@
-%% SIA Calibration
+%% SIA Calibration (Section 2.5)
+
+% This script calibrates the parameterisation provided in SIA_CMIP6_Parameterisation.m to the CMIP6 models and ensembles outlined in Table S1
     
 
 test_input_vals = [0.3505    0.0433    0.3647   -1.4719]; %    Test input values for each parameter to be calibrated
