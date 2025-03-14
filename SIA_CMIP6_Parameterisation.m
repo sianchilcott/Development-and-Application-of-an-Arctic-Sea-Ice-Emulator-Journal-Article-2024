@@ -1,5 +1,6 @@
 %% Function for Sea Ice Area (SIA) Parameterisation
-% Section 2.5
+% Section 2.5 of Chilcott and Meinshausen, 2025
+% This script provides the function for the parameterisations outlined in Section 2.5.1
 
 function obj = SIA_CMIP6_Calibration_Publication(SIA_max,x_tas,SIA,dec_previous_year_tas,p)
 
@@ -18,7 +19,7 @@ x_tas_shift = [dec_tas_test, x_tas];
 x_tas_shift(1) = dec_previous_year_tas;
 
 
-% Weight the temperatures (discussed in thesis Chapter 2 Section 2.3.5)
+% Weight the temperatures (discussed in Section 2.5.1 "The Seasonal Melt and Growth Weighting Scheme")
 for tt = 1:12 
 
     if tt == 1
