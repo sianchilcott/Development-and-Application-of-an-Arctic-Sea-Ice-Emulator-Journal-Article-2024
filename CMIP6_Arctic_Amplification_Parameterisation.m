@@ -1,6 +1,8 @@
 %% CMIP6 Arctic Amplification (AA) Parameterisation
+% This script provides the function for the CMIP6 Arctic Amplification parameterisation outlined in Section 2.3.
 
-rc_save = [];  % Save regression coefficients for CMIP6 AA parameterisation (Section 2.3)
+% Initialisation 
+rc_save = [];  % Save regression coefficients for CMIP6 AA parameterisation
 AAT_emulation_anomaly = [];  % Save Arcitc annual mean temperature anomaly
 AAT_emulation_absolute = []; % Save Arcitc annual mean temperature absolute
 for n = 1:3
@@ -35,7 +37,6 @@ rc_save = cell2mat(rc_save);
 
 
 %% Figure 2
-
 
 % Re-shape variables for plotting
 cmip6_anom = [tas_arctic_annual{1}, tas_arctic_annual{2}, tas_arctic_annual{3}]; % CMIP6 AAST (for comparison to my emulation)
