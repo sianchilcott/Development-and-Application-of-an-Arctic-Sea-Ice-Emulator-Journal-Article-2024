@@ -1,8 +1,8 @@
-%% Sensitivity Emulator
+%% Sensitivity Emulator: This script can be run to test whether the observational constraint has simulated a sensitivity (amount of Arctic sea ice lost in millions of km2 per degree of warming, m2 lost per tonne of emitted CO2). 
+% This assesses whether the constraints applied in Arctic_Amplification_Observational_Constraint.m have the intended impact.
 
 
-%% ______ Fig 7 (Section 3.2) (only March and September) _______ % 
-
+%% ______ Section 3.2- Fig.7 (only March and September) _______ % 
 
 % Initialise Plot  
 % movmean_ind = 1;
