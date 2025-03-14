@@ -1,4 +1,4 @@
-%% Probability Calculations
+%% Probability Calculations: This script can be used to calculate the probability of an ice-free Arctic Ocean using the CMIP6 parameterisation framework and their observational constraint (Section 3.3)
 
 %% Calculate the 1st year an ice-free Arctic Ocean occurs from our OC emulator
 
@@ -802,7 +802,7 @@ T1_126
 
 
 
-%% Global Temperature at which a 'likekly' ice-free ocean occurs: Fig 9
+%% Global Temperature at which a 'likekly' ice-free ocean occurs: Fig 9, Section 3.4
 
 close; clc
 figure(38)
@@ -1185,7 +1185,7 @@ end
 
 
 
-%% ____ Heat Map for Publication: Year and GMST ____ %% 
+%% ____ Heat Map- Section 3.4 Linear Regime: Year and GMST ____ %% 
 
 
 close all; clc
