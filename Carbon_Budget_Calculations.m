@@ -927,7 +927,7 @@ linear_mode_vert_plot = CB_for_plotting;
 
 
 
-% ________ Plot CARBON BUDGET Fig 5.3 Chapter 5, Section 5.3.1: linear mode months as horizontal boxplots _______ %
+% ________ Plot CARBON BUDGET Fig 8, Section 3.4: linear mode months as horizontal boxplots _______ %
 clc
 close all
 figure(3)
@@ -1630,7 +1630,7 @@ med = median( CB_at_b_2023(:,3), 'omitnan' );
 
 
 
-%% ____ Fig 8 ____ %% 
+%% ____ Fig 9 ____ %% 
 
 clc
 close all
