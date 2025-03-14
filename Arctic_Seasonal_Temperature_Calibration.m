@@ -1,5 +1,6 @@
 %% Arctic Seasonal Temperature (AMST) Calibration
-% Section 2.4
+% Section 2.4: This script is intended to calibrate the parameterisation function in the script, AMST_Parameterisation.m, with the CMIP6 models described in Tabls S1
+
 
 % Initialise
 parameters_store = [];      % Save parameters
@@ -39,7 +40,7 @@ for j = index_run
 
     % Calibration routine
     e = 0.3;
-    ffunc = @(ppp)AMST_parameterisation_publication2(ppp,x,y,AAMST,e);    % Calibration function (in another script: AMST_parameterisation_publication2.m)
+    ffunc = @(ppp)AMST_parameterisation_publication2(ppp,x,y,AAMST,e);    % Calibration function (in another script: AMST_parameterisation_publication2.m - must be run first)
 
 
     test_params = [0.5016, -7.1394,   -0.01, 0.9262,  -0.0883, -0.4367, +0.1015];    % Initial inputs to start calibration
@@ -83,7 +84,7 @@ for j = index_run
     a = cos((AAMST.*a1)+a2)+a3; 
 
 
-    % Cap the linear regressions of the calibration parameters so they don't change after the AAST rises above 8 degrees celsius (explained Chapter 2 Section 2.3.6)
+    % Cap the linear regressions of the calibration parameters so they don't change after the AAST rises above 8 degrees celsius (explained in Section 2.3)
     ind_temp = 8;
     indf = AAMST > ind_temp;
     indf = find(indf==1);
@@ -163,7 +164,7 @@ toc
 
 
 
-%% Figure 4: Test calibration
+%%  Test calibration
 
 % Plot Initialisation
 index_run = [1, 4, 7, 12];  % Example models to plot
