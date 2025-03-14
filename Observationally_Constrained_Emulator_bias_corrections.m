@@ -1,7 +1,7 @@
-%% Observationally Constrained Emulator
+%% Observationally Constrained Emulation Parameterisation Framework (Section 2.3.1 Section 2.4.1 and Section 2.5.2)
+
 
 %% ___________ Step i: Use the observationally constrained Arctic Amplification to calculate the Arctic annual mean temperature ______________________________________________________________________________________________________________________________________________________________________________________________________________________ %% 
-
 
 new_emulation_global_annual = [];
 pi_new_emulation_global_annual = [];
