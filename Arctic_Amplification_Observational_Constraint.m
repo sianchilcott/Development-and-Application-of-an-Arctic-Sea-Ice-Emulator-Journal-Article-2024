@@ -50,8 +50,8 @@ AA_obs_final = [obs_ensemble_AA; obs_ensemble_AA_BERKELY; obs_ensemble_AA_GISTEM
 %% Step 1: Create pdf from prior assumptions
 
 % Set boundaries for pdfs created from prior assumptions
-factor_p = [2.5, 3];      % parameter 'p' (Chapter 2, Section 2.4.2.1) - constant value after AA has increased over observational period
-factor_s = [4, 6.5];                % parameter 's' (Chapter 2, Section 2.4.2.1) - slope of AA increase over observational period
+factor_p = [2.5, 3];      % parameter 'p' (Section 2.3.1) - constant value after AA has increased over observational period
+factor_s = [4, 6.5];      % parameter 's' (Section 2.3.1) - slope of AA increase over observational period
 
 
 %____ S (slope over obs period) ____%
