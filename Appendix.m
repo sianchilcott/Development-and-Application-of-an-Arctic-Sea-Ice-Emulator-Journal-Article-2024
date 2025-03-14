@@ -1,6 +1,4 @@
-%% Appendix
-
-%% Fig A.4
+%% Supplementary Material
 
 
 parameters_store = [0.4941   -8.4259   -0.0063    0.9309   -0.0780   -0.5773    0.1017
@@ -169,7 +167,7 @@ set(gca, 'Fontsize', 14)
 
 
 
-%% Fig A.10: Vary calibration parameters SIA
+%% Vary calibration parameters SIA
 
 Save_sia_cal_params = new_vals;
 cal_factors = {Save_sia_cal_params(:,1), Save_sia_cal_params(:,4), Save_sia_cal_params(:,3), Save_sia_cal_params(:,2)};
@@ -337,7 +335,7 @@ end
 
 
 
-%% Fig A.3: Vary calibration parameters AMT
+%% Vary calibration parameters AMST
 
 xx2 = linspace(0,2*pi,13);
 x = xx2';
@@ -782,8 +780,6 @@ T1.(1) = categorical(T1.(1))
 %% Table of parameters: SIA
 
 
-
-
 model_names = [ models_alone; "Mean" ];
 
 
@@ -1078,8 +1074,7 @@ set(gcf,'PaperSize',[53 29.7000]);
 
 
 
-%% SENSITIVITY for completion seminar: march and sept
-% ONLY MARCH AND SEPT
+%% SENSITIVITY: march and sept
 
 
 % Initialise Plot  
@@ -1375,7 +1370,7 @@ set(gcf,'PaperSize',[51 30]);
 
 
 
-%% FigA.9: SIA VS AMST to show need for bias corrections
+%% SIA VS AMST to show need for bias corrections
 
 close all
 figure(41);
@@ -1423,7 +1418,7 @@ tt2.Box = 'off';
 
 
 
-%% Fig B4| Average 2080-2100 Calibrated AMST and SIA Annual Cycle
+%% Average 2080-2100 Calibrated AMST and SIA Annual Cycle
 
 % Plot initialisation
 index = [231:251];  % 2080-2100 index
@@ -1844,7 +1839,7 @@ set(tt2,'Position', newPosition,'Units', newUnits);
 
 
 
-%% FigB6: SHOW UNCONSTRAINED, CONSTRAINED, OBS:
+%% SHOW UNCONSTRAINED, CONSTRAINED, OBSERVATIONAL CONSTRAINT:
 
 % Constrained
 AMT_C_1974_2014 = cellfun(@(v) v(125:165,:), final_final_save_MAGICC_MCMC{1}(:), 'un', 0);
@@ -1914,7 +1909,7 @@ xlim([1 12])
 
 
 
-%% FigB5: MAGICC SIA 1979-2014 Annual Curve: OUR EMULATION COMPARISON WITH OBSERVED
+%% MAGICC SIA 1979-2014 Annual Curve: OUR EMULATION COMPARISON WITH OBSERVED
 
 
 SIA_MAGICC_ssps = [];
@@ -2194,7 +2189,7 @@ colorss2 = [1 0 0; 0 0 1; 0 0.3906 0];
 
 
 
-% Plot 12 panel figure
+% Plot panel figure
 h = subplot(2,1,2);
 x = 1:12;
 
@@ -2367,7 +2362,7 @@ end
 
 
 
-%%  Fig A6: Plot SIA and AMST bias correct and summer underestimation timeseries them together with observations
+%% Plot SIA and AMST bias correct and summer underestimation timeseries them together with observations
 
 
 % Find the mean SIA
