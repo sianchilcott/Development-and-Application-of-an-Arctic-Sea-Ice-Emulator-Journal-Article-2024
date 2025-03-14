@@ -1,7 +1,8 @@
-%% Arctic Amplification: Section 2.3
+%% This script assesses the possibility of constraining the Arctic Amplification to observations: Section 2.3.1
 
-% Initialise Obs
 
+
+% Initialise Observations
 close; clc
 
 % Label CMIP6 Calibrated Arctic Amplification (from CMIP6_Arctic_Amplification_Parameterisation.m)
@@ -15,7 +16,7 @@ CMIP6_AA = CMIP6_AA';
 y1_CMIP6 = median(cell2mat(CMIP6_AA), 'omitnan');
 
 
-%_____ Calculate the Observational Arctic Amplification from the observed Arctic annual mean temperature and global temperatures _____% (from xxx.m)
+%_____ Calculate the Observational Arctic Amplification from the observed Arctic annual mean temperature and global temperatures (datasets used can be found under data availability) _____% 
 movmean_ind = 5;
 global_mean_redshaped{4} = HADCRUT_GMST_obs{2}(1:171)';
 AAT_OBS = [BERKELY_monthly_mean_AAT(2); nan; CRUTEM_monthly_mean_AAT(1); HADCRUT_AAT; nan; GISTEMP_monthly_mean_AAT(3)];
@@ -25,7 +26,7 @@ AAT_OBS = [BERKELY_monthly_mean_AAT(2); nan; CRUTEM_monthly_mean_AAT(1); HADCRUT
 length_years = 21;
 x = movmean(GISTEMP_monthly_mean_AAT{3}(1:end-2), movmean_ind);
 y = movmean(global_mean_redshaped{6}, movmean_ind);
-AAT_slope = movingslope(x, length_years, 1);                        % movingslope is a downloaded added function from the matlab database (not my code)
+AAT_slope = movingslope(x, length_years, 1);                        % movingslope is a downloaded added function from the matlab database
 GMST_slope = movingslope(y, length_years, 1);
 obs_ensemble_AA_GISTEMP{1} = AAT_slope ./ GMST_slope;
 
@@ -47,8 +48,6 @@ AA_obs_final = [obs_ensemble_AA; obs_ensemble_AA_BERKELY; obs_ensemble_AA_GISTEM
 
 
 %% Step 1: Create pdf from prior assumptions
-
-
 
 % Set boundaries for pdfs created from prior assumptions
 factor_p = [2.5, 3];      % parameter 'p' (Chapter 2, Section 2.4.2.1) - constant value after AA has increased over observational period
