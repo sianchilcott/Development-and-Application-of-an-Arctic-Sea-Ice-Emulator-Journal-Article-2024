@@ -1,4 +1,6 @@
 %% Carbon Budget Calculations: Section 3.3
+% This script can be used to use the parameterisation framework of the observationally constrained parameterisations to understand 
+
 
 %% ____ Loading RCMIP cumulative CO2 data ____ %% 
 % Extract MAGICC Ensemble Members for Emulation
@@ -520,7 +522,7 @@ cb_1_ensembles = cell2mat(cb_1_ensembles);
 years = 1850:2023;
 ind = find(years == 2023);
 co2_2023 = co2_store(:,ind)';
-CB_store = cb_1_ensembles - co2_2023;       % Carbon Budget 2023 EMULATOR
+CB_store = cb_1_ensembles - co2_2023;       % Carbon Budget 2023 Emulation
 co2_2023_cmip6 = CO2_CMIP6(:,ind)';
 CB_store_cmip6_2023 = [];
 for i = 1:12
@@ -906,9 +908,9 @@ for i = index_months
 
     years = 1850:2023;
     ind = find(years == 2023);
-    co2_2023 = co2_store(:,ind);         % Cumulative CO2 emissions in 2023 EMULATOR
+    co2_2023 = co2_store(:,ind);         % Cumulative CO2 emissions in 2023 emulation
     co2_2023 = mean(co2_2023);
-    CB_for_plotting = cell2mat(cb_1_ensembles_final(:,i)) - co2_2023;      % Carbon Budget 2023 EMULATOR
+    CB_for_plotting = cell2mat(cb_1_ensembles_final(:,i)) - co2_2023;      % Carbon Budget 2023 emulation
     cb_1_ensembles_final_months_2023{i} = CB_for_plotting;
 
 end
@@ -1138,7 +1140,7 @@ grid
 
 
 %% _______ Non-linear mode month remaining carbon budget _______ %%
-% Fig 5.4 (Chapter 5)
+% Section 3.5
 
 
 threshold = [5, 95];
