@@ -1,10 +1,11 @@
 %% Assessing Calibrations to 2300: Section 3.1
+% This script can be used to evaluate the performance of the parameterisation framework to emulate CMIP6 projections outside of the calibration period.
 
 
 %% Part 1: Extract temperature using ARO IPCC WG1 AR6 shape file
 % Open shape file to extract ARO Temp Data
 
-shapefilePath = '/Users/smchilcott/Documents/PhD UniMelb/THESIS/Chapte 2_Winter sea ice to 2300/DATA_2300/IPCC-WGI-reference-regions-v4_shapefile/IPCC-WGI-reference-regions-v4.shp';
+shapefilePath = 'data pathway'
 
 % Read the shapefile
 shapefileData = shaperead(shapefilePath)
@@ -1928,8 +1929,7 @@ set(gcf,'PaperSize',[45 27.7000]);
 
 
 
-%% RATE OF SEASONAL ARCTIC SEA ICE LOSS WITH SEASONAL AA TO 2300: Fig3.6, Chapter 3, Section 3.3.1.3
-
+%% RATE OF SEASONAL ARCTIC SEA ICE LOSS WITH SEASONAL AA TO 2300:
 
 tas_aat_extracted = [aat_2300_anom_ruby(1:3); aat_2300_anom_ruby(5:6)];
 tas_gmst_extracted = [tas_global_2300_anom_ruby(1:3), tas_global_2300_anom_ruby(5:6)];
@@ -2039,7 +2039,7 @@ set(gcf,'PaperSize',[53 29.7000]);
 
 
 
-%% RATE OF ANNUAL ARCTIC SEA ICE LOSS WITH ANNUAL AA TO 2300: Fig3.5, Chapter 3, Section 3.3.1.3
+%% RATE OF ANNUAL ARCTIC SEA ICE LOSS WITH ANNUAL AA TO 2300: 
 
 tas_aat_extracted = [aat_2300_anom_ruby(1:3); aat_2300_anom_ruby(5:6)];
 tas_gmst_extracted = [tas_global_2300_anom_ruby(1:3), tas_global_2300_anom_ruby(5:6)];
@@ -2126,7 +2126,7 @@ set(gcf,'PaperSize',[53 29.7000]);
 
 
 
-%% UNDERSTANDING THE SIA PARAMETERISATION FOR CHAPTER 3: WITH WEIGHTING
+%% UNDERSTANDING THE SIA PARAMETERISATION 3: WITH WEIGHTING
 
 j = 3; % Use as an example model
 x_tas_store = AMST_calibration_bias_corrected_2300_extraced{j};
@@ -2230,7 +2230,7 @@ yline(10)
 
 
 
-%% UNDERSTANDING THE SIA PARAMETERISATION FOR CHAPTER 3: WITH OUT WEIGHTING
+%% UNDERSTANDING THE SIA PARAMETERISATION: WITH OUT WEIGHTING
 
 j = 3; i = 5;
 x_tas = AMST_calibration_bias_corrected_2300_extraced{j}(:,i);
