@@ -27,7 +27,7 @@ pi_new_emulation_global_annual_OC = pi_new_emulation_global_annual;
 
 %% ___________ STEP ii: Arctic Seasonal Temperature Parameterisation with Observational Constraints ______________________________________________________________________________________________________________________________________________________________________________________________________________________ %% 
 
-% 1st calculate the Arctic Seasonal Temperature from CMIP6 calibration parameters before adding bias corrections (explained in Chapter 2, Section 2.4.2.2)
+% 1st calculate the Arctic Seasonal Temperature from CMIP6 calibration parameters before adding bias corrections (explained in Section 2.3)
 % Initialise
 x = linspace(0,2*pi,13); 
 final_final_save_OC = [];
@@ -313,7 +313,7 @@ new_vals = [0.3795    0.3961    0.5408   -1.3240
 SIA_bias_corrected_OC = [];
 SIA_bias_corrected_OC_store = [];
 index_run = 1:12;
-sia_resid_diff = [0.0    -0.3758   0.0   0.00    0.1000   0.7000   1.9000    2.0    0.7    0.4885    0.4030    0.5]; % SIA constant offset/ bias correction (explained in Chapter 2, Section 2.4.2.2)
+sia_resid_diff = [0.0    -0.3758   0.0   0.00    0.1000   0.7000   1.9000    2.0    0.7    0.4885    0.4030    0.5]; % SIA constant offset/ bias correction (explained in Section 2.5.2)
 
 tic
 for n = 1:3
