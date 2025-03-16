@@ -22,6 +22,8 @@ The framework requires each script to be run separately in a specific order (def
 - SIA_max_Calibration.m
 - SIA_Calibration.m
 
+While this repository intends to provide a series of scripts to re-implement the method described in the Chilcott and Meinshausen, (2025) manuscript, (the scripts in [2] therefore intend to show the calibration of the first ensemble member of each CMIP6 model used), it is possible to use these scripts to calibrate to other ensemble members of the same CMIP6 model. 
+
 [3] The calibration parameters generated from running the scripts in [2] are then used in the following scripts to constrain the CMIP6 calibrations to observations:
 - Arctic_Amplification_Observational_Constraint.m (Section 2.3.1)
 - Observationally_Constrained_Emulator_bias_corrections.m (Section 2.4.1 and Section 2.5.2)
