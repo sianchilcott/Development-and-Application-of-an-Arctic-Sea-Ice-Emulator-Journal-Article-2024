@@ -2,7 +2,7 @@
 
 SETUP INSTRUCTIONS FOR ZENODO AND GITHUB REPOSITORIES (https://doi.org/10.5281/zenodo.14020702):
 
-The following provides an introduction and guide to the Zenodo and github repositories, for the pre-print manuscriupt presenting an Arctic Sea Ice Emulator parameterisation framework. The following scripts were run using the progammng interface MATLAB, version 2024, with no additional add-ons.
+The following provides an introduction and guide to the Zenodo and github repositories, for the pre-print manuscriupt presenting an Arctic Sea Ice Emulator parameterisation framework. The following scripts were run using the progammng interface MATLAB R2024b, with no additional add-ons or libraries.
 
 This code is intended to showcase a parameterisation framework that compliments the in-text parameterisations and analysis provided, rather than a runnable tool. We intend for this setup to be a framework that can be reimplemented from the in-text parameterisations, provided and the functions and analysis provided in this repository. The scripts we provide here are therefore intended to be a reference that can be used to further understand the intext described process, it is not intended to be a ‘single click’ runnable tool. 
 
