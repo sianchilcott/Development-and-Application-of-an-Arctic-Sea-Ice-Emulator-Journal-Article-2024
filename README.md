@@ -8,6 +8,7 @@ This code is intended to showcase a parameterisation framework that compliments 
 
 Data: The scripts in this repository is setup to run using only the datasets described in the adjoining paper. This version does not support flexible data types. It can only be run using the CMIP6 models outlined in the paper over the 1850-2100 time period, alongside the observational datasets referenced, the MAGICC global-mean surface temperature ensemble and the RCMIP CO2 emission datasets.
 Observational sea ice products can be found at: https://www.cen.uni-hamburg.de/en/icdc/data/cryosphere/uhh-sea-ice-area-product.html
+CMIP6 data can be found at: https://cmip6.science.unimelb.edu.au/search and https://aims2.llnl.gov/search/cmip6/
 
 The framework requires each script to be run separately in a specific order (defined in [1], [2] and [3]), using the data described under the ‘Data’ section above. Our setup does not currently support other datasets than those described in Section 2 of the adjoining paper, however the setup does accomodate other CMIP6 models and their ensembles than those currently used to run the setup. The following paragraph indicates the order in which each script can be run to reimplement the method in the paper:
 
