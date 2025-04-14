@@ -30,10 +30,7 @@ The framework requires each script to be run separately in a specific order (def
 While this repository intends to provide a series of scripts to re-implement the method described in the Chilcott and Meinshausen, (2025) manuscript, (the scripts in [2] therefore intend to show the calibration of the first ensemble member of each CMIP6 model used), it is possible to use these scripts to calibrate to other ensemble members of the same CMIP6 model. 
 
 [3] The calibration parameters generated from running the scripts in [2] are then used in the following scripts to constrain the CMIP6 calibrations to observations. The observationally constrained framework for emulation is as follows:
-- 
-
-- Arctic_Amplification_Observational_Constraint.m (Section 2.3.1)
-- Observationally_Constrained_Emulator_bias_corrections.m (Section 2.4.1 and Section 2.5.2)
+- Observationally_constrained_parameterisation_framework (Section 2.3.1, Section 2.4.1 and Section 2.5.2)
 
 [5] We evaluated our model performance to understand if the parameterisations provided could project the non-linearity of Arctic sea ice loss outside of the calibration period using the following scripts:
 - Assessing_calibrations_to_2300.m (Section 3.1)
