@@ -12,20 +12,26 @@ CMIP6 data can be found at: https://cmip6.science.unimelb.edu.au/search and http
 
 The framework requires each script to be run separately in a specific order (defined in [1], [2] and [3]), using the data described under the ‘Data’ section above. Our setup does not currently support other datasets than those described in Section 2 of the adjoining paper, however the setup does accomodate other CMIP6 models and their ensembles than those currently used to run the setup. The following paragraph indicates the order in which each script can be run to reimplement the method in the paper:
 
-[1] All files ending in ‘parameterisation.m’, are the parameterisations that make up the emulator and are referred to in the manuscript. These scripts must be run first, in any order.
+[1] To run the CMIP6 calibrated parameterisations:
+- Parameterisation_Framework_for_the_Emulation_of_CMIP6_Arctic_Sea_Ice
+
+
+[2a] To calibrate the above parameterisations with the CMIP6 data for models outside of those trained on, the following scripts must be run in the order outlined below. All files ending in ‘parameterisation.m’, are the parameterisations that make up the emulator and are referred to in the manuscript. These scripts must be run first, in any order.
 - CMIP6_Arctic_Amplification_Parameterisation.m (Section 2.3)
 - AMST_parameterisation.m (Section 2.4)
 - SIA_max_Parameterisation.m (Section 2.5.1)
 - SIA_CMIP6_Parameterisation.m (Section 2.5.1)
 
-[2] To calibrate the above parameterisations with the CMIP6 data, the following scripts must be run in the following order:
+[2b] Scripts for calibrating the parameterisations:
 - Arctic_Seasonal_Temperature_Calibration.m
 - SIA_max_Calibration.m
 - SIA_Calibration.m
 
 While this repository intends to provide a series of scripts to re-implement the method described in the Chilcott and Meinshausen, (2025) manuscript, (the scripts in [2] therefore intend to show the calibration of the first ensemble member of each CMIP6 model used), it is possible to use these scripts to calibrate to other ensemble members of the same CMIP6 model. 
 
-[3] The calibration parameters generated from running the scripts in [2] are then used in the following scripts to constrain the CMIP6 calibrations to observations:
+[3] The calibration parameters generated from running the scripts in [2] are then used in the following scripts to constrain the CMIP6 calibrations to observations. The observationally constrained framework for emulation is as follows:
+- 
+
 - Arctic_Amplification_Observational_Constraint.m (Section 2.3.1)
 - Observationally_Constrained_Emulator_bias_corrections.m (Section 2.4.1 and Section 2.5.2)
 
