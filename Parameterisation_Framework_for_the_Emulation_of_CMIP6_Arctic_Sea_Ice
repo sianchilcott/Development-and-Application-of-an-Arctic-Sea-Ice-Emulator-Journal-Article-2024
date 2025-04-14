@@ -1,0 +1,628 @@
+# Parameterisation Framework for the Emulation of CMIP6 Arctic Sea Ice
+
+Model_order = 
+    [{["ACCESS-CM2"     ]}
+    {["ACCESS-ESM1-5"  ]}
+    {["CESM2-WACCM"    ]}
+    {["CESM2"          ]}
+    {["CNRM-CM6-1-HR"  ]}
+    {["CanESM5"        ]}
+    {["FGOALS-g3"      ]}
+    {["HadGEM3-GC31-LL"]}
+    {["MIROC-ES2L"     ]}
+    {["MIROC6"         ]}
+    {["MPI-ESM1-2-LR"  ]}
+    {["MRI-ESM2-0"     ]}]
+
+
+rc_save = [2.9934  
+          3.0230    
+          2.4364    
+          2.4143    
+          2.7328    
+          3.1567    
+          3.1055    
+          3.5148    
+          3.3949   
+          4.0467    
+          2.7246    
+          3.1176];  % Calibration parameters CMIP6 Arctic Amplification regression coefficient (or AA factor) from calibration
+
+parameters_store_new = [0.4941   -8.4259   -0.0063    0.9309   -0.0780   -0.5773    0.1017
+                        0.5613   -7.1602   -0.0071    0.9319   -0.0333    0.1384    0.1348
+                        0.6322   -6.0756   -0.0031    0.9697   -0.0893   -0.6312    0.1086
+                        0.5826   -6.2933   -0.0042    0.9557   -0.0964   -0.6432    0.1123
+                        0.4154   -7.7789   -0.0007    0.9688   -0.0551   -0.0804    0.1267
+                        0.5391   -7.4667   -0.0076    0.9505   -0.0875   -0.3211    0.0084
+                        0.3465  -11.3899   -0.0009    1.0264   -0.0147    0.6405    0.3556
+                        0.4858   -8.3263   -0.0062    0.9415   -0.0924   -0.5403    0.0691
+                        0.4479   -9.0050   -0.0040    0.9766   -0.0973   -0.4534    0.0820
+                        0.4378   -8.0920   -0.0057    0.9489   -0.1060   -0.3702    0.0921
+                        0.5550   -6.4767   -0.0016    0.9877   -0.0218    0.9385    0.5679
+                        0.5196   -7.3501   -0.0036    0.9572   -0.0943   -0.5025    0.0998]; % Calibration parameters for CMIP6 seasonal arctic temperature parameterisation from calibration
+
+new_vals = [0.3795    0.3961    0.5408   -1.3240
+            0.4006   -0.0411    0.5451   -0.9881
+            0.2952    0.0687    0.2140   -4.4366
+            0.2958   -0.1261    0.1251   -4.4320
+            0.4096   -0.0108    1.0000   -0.7661
+            0.4010    0.5436    0.5505    0.6585
+            0.3473   -0.1438    0.4485    0.6471
+            0.3242    0.4528    0.2728   -0.9961
+            0.3240   -0.4721    0.4894   -1.1122
+            0.2555    0.2036         0   -1.3647
+            0.3889   -0.4409         0   -1.7137
+            0.3848    0.0896    0.1904   -1.8352]; % Calibration parameters for CMIP6 seasonal arctic SIA parameterisation from calibration
+
+
+
+
+
+%% ________ Step i: CMIP6 Arctic Amplification (AA) Parameterisation________ %%
+% This section provides the function for the CMIP6 Arctic Amplification parameterisation outlined in Section 2.3.
+
+% Initialisation 
+rc_save = [];  % Save regression coefficients for CMIP6 AA parameterisation
+AAT_emulation_anomaly = [];  % Save Arcitc annual mean temperature anomaly
+AAT_emulation_absolute = []; % Save Arcitc annual mean temperature absolute
+for n = 1:3
+    for j = 1:12
+        
+        % CMIP6 Data
+        rw = tas_global{n}{j};              % CMIP6 global mean surface air temperature
+        raa = tas_arctic_annual{n}{j};      % CMIP6 Arctic annual mean surface air temperature
+
+        
+        % Calculate the Arctic annual temperature anomaly 
+        AAT_emulation_anomaly{j,n} = rw .* rc_save{j,1};   % rc_save is given at the start of the script and is the AA factor for each model and is beta (ß) in the in-text paper. j is the index for each model.
+        
+
+        % Calculate the Arctic annual temperature absolute  
+        CMIP6_AAT = mean(tas_store{n}{j}, 2);  % tas_store = absolute CMIP6 Arctic seasonal temperature dataset for all models used
+        PI_cmip6 = mean(CMIP6_AAT(1:50)); % preindustrial temperature  
+        AAT_emulation_absolute{j,n} = (rw .* rc_save{j,1}) + PI_cmip6;
+
+    end
+end
+
+
+
+
+%% Figure 2: Plot to test Arctic Amplification/ Arctic Annual Mean Temperature
+
+% Re-shape variables for plotting
+cmip6_anom = [tas_arctic_annual{1}, tas_arctic_annual{2}, tas_arctic_annual{3}]; % CMIP6 AAST (for comparison to my emulation)
+cmip6_anom_and_absolute = {cmip6_anom, AAT_ABS_PI};                              % Combine CMIP6 anomaly and absolute temperature
+emul_anom_and_absolute = {AAT_emulation_anomaly, AAT_emulation_absolute};        % Emulated anomaly and absolute AAST
+
+
+% Plot Initialisation   
+threshold = [17 83]; % Likely Range
+ssp_legend = {'SSP5-8.5', 'SSP2-4.5', 'SSP1-2.6'};
+hnew_VL_range_emul = [];
+hnew_VL_range_cmip6 = [];
+hnew_mean_emul = [];
+hnew_mean_cmip6 = [];
+
+% Start plotting
+close all; clc
+figure(40)
+set(gcf, 'Units', 'Inches', 'Position', [.4 .4 19 10])
+counter = 0;
+for tt = 1:2                                                        % when tt=1 we plot the anomaly temperature and tt=2 we plot the absolute
+
+    % counter = counter + 1;
+
+    emul_anomaly_or_abso_data = emul_anom_and_absolute{tt};         % Emulation
+    cmip6_anomaly_or_abso_data = cmip6_anom_and_absolute{tt};       % CMIP6 for comparison           
+
+    for n = 1:3     % Plot each SSP           
+        counter = counter + 1;
+        h = subplot(2,3,counter);
+
+        Emul = emul_anomaly_or_abso_data(:,n);       
+        CMIP6 = cmip6_anomaly_or_abso_data(:,n);         
+
+        % Initialise the mean of emulation and CMIP6
+        emul_mean = mean(cell2mat(Emul));
+        cmip6_mean = mean(cell2mat(CMIP6));
+        
+        % Initialise the year to plot the timeseries
+        x = 1850:2100;
+        
+        % Calculate the likely percentile range
+        percentile_Emul = prctile(cell2mat(Emul), threshold);      % Emulation
+        percentile_CMIP6 = prctile(cell2mat(CMIP6), threshold);    % CMIP6
+        
+        % Initialise the percentile range to plot the shaded likely range 
+        curve1_emul = percentile_Emul(2,:);
+        curve2_emul = percentile_Emul(1,:);
+
+        curve3_cmip6 = percentile_CMIP6(2,:);
+        curve4_cmip6 = percentile_CMIP6(1,:);
+
+        % Plot the shaded area between the upper and lower likely percentiles
+        x2 = [x, fliplr(x)];
+        inBetween_emul = [curve1_emul, fliplr(curve2_emul)];
+        inBetween_cmip6 = [curve3_cmip6, fliplr(curve4_cmip6)];
+
+        % Fill in the area between the upper and lower likely percentiles
+        % Emulation
+        c = colmat(n,:);
+        f = fill(x2, inBetween_emul, c, 'edgecolor','none');
+        set(f,'facealpha',.3)
+        hold on
+        
+        % CMIP6
+        c = [0 0 0];
+        f2 = fill(x2, inBetween_cmip6, c, 'edgecolor','none'); 
+        set(f2,'facealpha',.3)
+        
+        % Plot the mean:
+        d = colmat(n,:);
+        emul = plot(x, emul_mean, 'color', d, 'LineWidth', 3);     % Emulation
+
+        c = [0 0 0];
+        cmip6 = plot(x, cmip6_mean, 'color', c, 'LineWidth', 3);   % CMIP6                          
+
+        % Title for each panel
+        if ismember(tt, [2])
+            ending = ['Absolute'];
+        else
+            ending = ['Anomaly'];
+        end
+        title([ending, ': ' ssp_legend{n}])
+        
+        % Plot labels
+        if tt == 1 && n == 1
+            ylab = ylabel( 'Emulated Arctic Annual Temperature (\circC)' , 'Position', [1.82e+03 -5 -1]);
+        end
+        if ismember(counter, 4:6)
+            xlabel('Year')
+        end
+
+        % Save plots for legend
+        if tt == 1
+            hnew_VL_range_emul = cat(1, hnew_VL_range_emul, f);
+            hnew_mean_emul = cat(1, hnew_mean_emul, emul);  
+
+            if n == 3
+                hnew_mean_cmip6 = cat(1, hnew_mean_cmip6, cmip6);
+                hnew_VL_range_cmip6 = cat(1, hnew_VL_range_cmip6, f2);
+            end               
+        end
+
+        h.Position(1) = h.Position(1) - 0.06;
+
+        % Set fontsize of plot labels
+        set(gca,'FontSize', 19)
+        xlim([1850 2100])
+
+        grid
+    end
+end
+
+% Save
+set(gcf,'Units','inches');
+screenposition = get(gcf,'Position');
+set(gcf,'PaperSize',[49 25.5]);
+
+% temp=[' Fig2.2 ','.pdf']; 
+% saveas(gca,temp);
+%% ______________________________________ %%
+
+
+
+
+
+
+%% ________ Step ii: CMIP6 Arctic Seasonal Temperature (AMST) Parameterisation________ %%
+
+%% Arctic Seasonal Temperature (AMST)
+% Section 2.4: This seciton of the script is intended to emulate the Arctic Seasonal Temperature
+
+tic
+% Plotting
+ssp_char_store = {'SSP585', 'SSP245', 'SSP126'};
+x = linspace(0,2*pi,13);
+AMST_emulation = [];
+close
+disp('__________')
+    
+for n = 1:3
+  for j = 1:4
+      disp('NEW MODEL')
+  
+  %    Emulated AAT
+      siza_AAT = size(AAT_emulation_absolute{j,n});
+      AAT = AAT_emulation_absolute{j,n};
+      AAT = AAT';
+  
+      f1 = parameters_store_new(j,1);
+      f2 = parameters_store_new(j,2);
+      g1 = parameters_store_new(j,3);
+      g2 = parameters_store_new(j,4);
+      a1 = parameters_store_new(j,5);
+      a2 = parameters_store_new(j,6);
+      a3 = parameters_store_new(j,7);
+  
+  
+      e = 0.3;
+      f = (f1.*AAT) + f2;
+      g = (g1.*AAT) + g2;
+      a = cos((AAT.*-a1)-a2)+a3;
+  
+      monthlytemp2 = f.*(cos(x .* g - e .* exp(cos(x.^(a))))+((AAT - mean(f.*(cos(x .* g - e .* exp(cos(x.^(a))) )), 2, 'omitnan')) ./ f));
+  
+      AMST_emulation{j,n} = monthlytemp2(:,1:12);
+        
+  end
+end
+disp('___END RUN___')
+
+
+
+% Step 2: Reshape AMST for plotting: Plot each month
+residuals = [ -1.6389   -0.0871   -2.5343   -3.6325   -1.3841   -0.5898   -1.5388   -1.1312   -0.0902   -1.5824   -1.9892   -1.3987 ];
+clc
+tic
+amt_mon_rearrange = [];
+amt_mon_rearrange_cmip6 = [];
+AMST_ssp460_emulation_rearrange = [];
+amt_mon_ensem = [];
+amt_mon_rearrange_hold = [];
+
+disp('__________')
+for n = 1:3
+  for j = 1:4
+      disp('NEW MODEL')
+  
+      amt_hold = AMST_emulation{j,n};
+      CMIP6_hold = tas_store{j,n};
+  
+      for i = 1:12
+          amt_mon_rearrange{j,i} = amt_hold(:,i)' + residuals(i);
+          amt_mon_rearrange_cmip6{j,i} = CMIP6_hold(:,i)';
+      end                
+  
+  end
+  AMST_emulation_rearrange{n} = amt_mon_rearrange;
+  AMST_CMIP6_rearrange{n} = amt_mon_rearrange_cmip6;
+end
+toc
+disp('___END RUN___')
+
+
+
+%%  Test arctic seasonal temperature calibration through plot
+threshold = [17 83];
+hnew_means = [];    
+shades_ssps = [];
+counter = 1;
+close; clc
+
+figure(40)
+set(gcf, 'Units', 'Inches', 'Position', [.5 .5 20 11])   
+for n = 1:3
+  emul = AMST_emulation_rearrange{n};
+  cmip6 = AMST_CMIP6_rearrange{n};
+  ssp = ssp_char_store{n};
+  for i = 1:12
+      
+      h = subplot(3,4,i);
+      counter = counter + 1;
+      x = 1850:2100;
+  
+      % Emul
+      y1 = median(cell2mat(emul(:,i)), 'omitnan');
+      stdY = prctile(cell2mat(emul(:,i)), threshold);
+      curve1 = stdY(2,:);
+      curve2 = stdY(1,:);
+          
+      % CMIP6
+      y1CMIP6 = median(cell2mat(cmip6(:,i)), 'omitnan');
+      stdYCMIP6 = prctile(cell2mat(cmip6(:,i)), threshold);
+      curve1_cmip6 = stdYCMIP6(2,:);
+      curve2_cmip6 = stdYCMIP6(1,:);
+  
+  
+      % Shading: 
+      x2 = [x, fliplr(x)];
+      inBetween = [curve1, fliplr(curve2)];
+      inBetween_cmip6 = [curve1_cmip6, fliplr(curve2_cmip6)];
+  
+      % Fill:
+      c = colmat(3,:);
+      f = fill(x2, inBetween, c, 'edgecolor','none');
+      set(f,'facealpha',.3)
+      hold on
+      if i == 12
+  	    shades_ssps = cat(1, shades_ssps, f);
+      end
+  
+      c = [0 0 0];
+      f_cmip6 = fill(x2, inBetween_cmip6, c, 'edgecolor','none');
+      set(f_cmip6,'facealpha',.3)
+      hold on
+  
+  
+      
+  %   Plot Means SSP
+      plt = plot(x, y1, 'color', colmat(3,:), 'LineWidth', 2);
+      plt = plot(x, y1CMIP6, 'color', [0 0 0], 'LineWidth', 2);
+      if i == 12
+          hnew_means = cat(1, hnew_means, plt);
+      end
+      set(gca,'FontSize', 20)
+  
+      title([month_label(i)], 'fontsize', 22)
+  
+  %   Y Label
+      if ismember(i, [1,5,9])
+          ylabel({'Arctic Seasonal'; 'Temperature (\circC)'})
+      end
+  
+  %   X Label
+      if ismember(i, [9:12])
+          xlabel({'Year'})
+      end    
+            
+      xlim([1850 2100]);
+  end
+end
+toc
+%% ______________________________________________________________________ %% 
+
+
+
+%% ________ Step iii: CMIP6 Seasonal Sea Ice Area (SIA) Parameterisation________ %%
+
+
+index_run = [1:12];
+close all
+for n = 1:3  
+    for j = index_run       
+        hnew3 = [];
+
+    %   Counter for plotting
+        counter = counter + 1;
+        tt_store = 1:12;
+        
+    %   SIA
+        SIA_store = movmean(updated_hist_sia_annual_curve_all_models{j,n}, movmean_ind);
+        
+    %   Emulated AMST
+        x_tas_store = movmean(AMST_emulation{j,n}, movmean_ind);
+        x_tas_store2 = movmean(AMST_emulation{j,n}, movmean_ind);
+        
+        
+%        CMIP6 AMT
+%         x_tas_store = movmean(tas_store{n}{j}, movmean_ind);
+%         x_tas_store2 = movmean(tas_store{n}{j}, movmean_ind);
+
+
+%       CMIP6 tas
+        cmip6_tas = movmean(tas_store{n}{j}, movmean_ind);
+        
+
+    %   Rename everything for plotting later
+        SIA = SIA_store;
+        x_tas = x_tas_store;
+
+    %   Use parameterised SIA_max
+        SIA_max = SIA_max_param_1850(j,1:12);      
+        
+        a = new_vals(j,1);
+        sm_shift = new_vals(j,2);
+        w1_store = new_vals(j,3);
+        b = new_vals(j,4);
+        
+      
+%      Apply Weighting Scheme
+        tas_hold = x_tas_store(end-length(x_tas_store)+1,:);
+        dec_previous_year_tas = tas_hold(12);
+        dec_tas_test = x_tas(:,12);
+        dec_tas_test = circshift(dec_tas_test,1);
+        x_tas_shift = [dec_tas_test, x_tas];
+        x_tas_shift(1) = dec_previous_year_tas;
+        
+        x_tas_hold = [];
+        for tt = 1:12 
+
+            if tt == 1
+                hold_x_tas = ((x_tas(:,tt) .* w1_store) + (x_tas_shift(:,1) .* (1-w1_store))) ./ (w1_store+(1-w1_store));
+            else
+                hold_x_tas = ((x_tas(:,tt) .* w1_store) + (x_tas(:,tt-1) .* (1-w1_store))) ./ (w1_store+(1-w1_store));
+            end
+
+            x_tas_hold(:,tt) = hold_x_tas;
+        end
+
+        x_tas = x_tas_hold; 
+            
+        % Re-run the equation with optimised parameters
+        updated_fun2 = ( ((SIA_max+sm_shift) .* (1 + exp((x_tas(1,:)-b)))) - (a.*(x_tas - x_tas(1,:))) ) ./ ( 1 + exp(x_tas-b) );
+        sia_emulation{j,n} = updated_fun2;
+        
+    end
+end
+SIA_CAL_CMIP6_ALONE = sia_emulation;
+
+
+
+% Test SIA for plottinf
+tic
+sia_emul_rearrange = [];
+sia_emul_final_NO_BC = [];
+
+sia_cmip6_rearrange = [];
+sia_cmip6_rearrange_final_NO_BC = [];
+for n = 1:3
+    disp('__________')    
+    for j = 1:12
+        disp('NEW MODEL')
+        
+        for i = 1:12
+            sia_emul_rearrange{j,i} = sia_emulation{j,n}(:,i)';
+            sia_cmip6_rearrange{j,i} = updated_hist_sia_annual_curve_all_models{j,n}(:,i)';
+        end
+    end
+    sia_emul_final{n} = sia_emul_rearrange;
+    sia_cmip6_rearrange_final{n} = sia_cmip6_rearrange;
+end
+toc
+
+
+
+% threshold = [5 95];
+threshold = [17 83];
+plot_run = 1;
+SIA_obs = monthly_obs_SIA;
+counter = 0;
+close
+
+if plot_run == 1
+    
+    for n = 1
+        ssp = ssp_char_store{n};
+        sia_cmip6 = sia_cmip6_rearrange_final{n};
+        emul = sia_emul_final{n};
+
+        for i = [1:12]
+            counter = counter + 1;
+
+            figure(42)
+            h = subplot(3,4,i);
+    %         h = subplot(1,1,1);
+            set(gcf, 'Units', 'Inches', 'Position', [.5 .5 20 11])
+
+
+            % Median SSP 
+            y1 = mean(cell2mat(emul(:,i)), 'omitnan');
+
+            % CMIP6 DATA 
+            y1_cmip6 = mean(cell2mat(sia_cmip6(:,i)), 'omitnan');
+
+
+            x = 1850:2100;
+
+
+            % Percentile: Calibration
+            stdY = prctile(cell2mat(emul(:,i)), threshold);
+
+            % Percentile: CMIP6
+            stdY_cmip6 = prctile(cell2mat(sia_cmip6(:,i)), threshold);
+
+
+            % Create curves: Calibration
+            curve1 = stdY(2,:);
+            curve2 = stdY(1,:);
+
+
+            % Create curves: CMIP6 
+            curve3 = stdY_cmip6(2,:);
+            curve4 = stdY_cmip6(1,:);
+
+
+            % Shading std area: Calibration
+            x2 = [x, fliplr(x)];
+            inBetween = [curve1, fliplr(curve2)];
+
+
+            % Shading std area: CMIP6 
+            x3 = [x, fliplr(x)];
+            inBetween2 = [curve3, fliplr(curve4)];
+
+
+            % Fill: Calibration
+            c = colmat(n,:);
+            f = fill(x2, inBetween, c, 'edgecolor','none');
+            set(f,'facealpha',.2)
+            hold on
+
+
+            % Fill: CMIP6
+            d = [0 0 0]+0.1;
+            f2 = fill(x3, inBetween2, d, 'edgecolor','none');
+            set(f2,'facealpha',.3)
+            hold on
+
+
+        %   Plot Means SSP
+            plt = plot(x, y1, 'color', colmat(n,:), 'LineWidth', 2);
+            plt_cmip6 = plot(x, y1_cmip6, 'color', [0 0 0], 'LineWidth', 2);
+
+
+            % PLOT SIA OBS
+            % for m = 3:6
+            %     pls_obs = plot(1850:2019, monthly_obs_SIA{m}{i}, 'color', [0 0 1], 'LineWidth', 1);
+            % end
+
+
+            set(gca,'FontSize', 19)
+
+            title([month_label(i)], 'fontsize', 22);
+
+
+            sgtitle(['Calibrated SIA to CMIP6'], 'fontsize', 28);
+
+
+            pos = get(h, 'Position');
+            posnew = pos; 
+            posnew(1) = posnew(1) - 0.055;
+            posnew(2) = posnew(2) - 0.04;
+            set(h, 'Position', posnew);
+
+
+
+        %   Y Label
+            if ismember(i, [1,5,9])
+                ylabel({'Arctic SIA'; '(million km^{2})'})
+            end
+
+        %   X Label
+            if ismember(i, [9:12])
+                xlabel({'Year'})
+            end    
+
+            xlim([1850 2100])
+            ylim([0 18])
+            yline(1)
+
+
+        end
+    end
+    
+    if n == 1
+
+    tt2 = legend('SSP585 Emulation','SSP585 CMIP6',...
+    'SSP585 Emulated Mean', 'SSP585 CMIP6 Mean', ...
+    'location', 'eastoutside', 'NumColumns', 1, 'fontsize', 15);
+    elseif n == 2
+    
+        tt2 = legend('SSP245 SSP245','SSP245 CMIP6',...
+        'SSP245 Emulated Mean', 'SSP245 CMIP6 Mean', ...
+        'location', 'eastoutside', 'NumColumns', 1, 'fontsize', 15);
+    
+    elseif n == 3
+        
+        tt2 = legend('SSP126 Emulation','SSP126 CMIP6',...
+        'SSP126 Emulated Mean', 'SSP126 CMIP6 Mean', ...
+        'location', 'eastoutside', 'NumColumns', 1, 'fontsize', 15);
+    
+    end
+
+
+
+    % Posistion legend in the correct place
+    newPosition = [0.9 0.45 0.05 0.05];
+    newUnits = 'normalized';
+    set(tt2,'Position', newPosition,'Units', newUnits);
+
+    % % Save
+    % temp=[' SIA timeseries ','.png']; 
+    % saveas(gca,temp); 
+end
+%% ______________________________________________________________________ %% 
+
+
